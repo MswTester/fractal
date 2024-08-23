@@ -5,7 +5,7 @@ import path from 'path'
 import dotenv from 'dotenv'
 import { MongoClient, ObjectId } from 'mongodb'
 
-const rootDir = path.join(__dirname, '/../');
+const rootDir = path.join(__dirname.replaceAll('src', '').replace('dist', ''), '../');
 const envPath = path.join(rootDir, '/.env');
 dotenv.config({ path: envPath });
 console.log('envPath:', envPath);
@@ -30,7 +30,7 @@ const main = async () => {
     app.get('/', (req, res) => {
         res.send('Server is running: ' + uri);
     });
-    
+
     io.on('connection', (socket) => {
         socket.on('logined', async (id:string) => {
             console.log('logined:', id);
