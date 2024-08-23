@@ -9,7 +9,7 @@ import { useCompset } from "~/utils/compset";
 import Home from "./home";
 
 export const isDev:boolean = process.env.NODE_ENV === 'development'
-const url = isDev ? 'http://127.0.0.1:3000' : 'https://fractal.onrender.com/'
+const url = isDev ? 'http://127.0.0.1:3000' : 'https://fractal-d6jf.onrender.com'
 
 export default function Main() {
     const {patch, useOnce, isFetching, addAlert, addError, lng} = useCompset()
