@@ -36,9 +36,17 @@ export function sha256(input: string): string {
 }
 
 export function checkName(str:string):boolean{
-    return (str.match(/^[A-Za-z0-9_\s]+$/) && str != '' && str.length > 2 && str.length < 13) as boolean
+    return (str.match(/^[a-zA-Z0-9_]{3,11}$/) && str.trim() != '') as boolean
 }
 
 export function checkPassword(str:string):boolean{
-    return (str.match(/^[A-Za-z0-9!@#$%^&*()_\-+=~]+$/) && str != '' && str.length > 5) as boolean
+    return (str.match(/^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d!@#$%^&*()_\-+=~]{6,}$/) && str.trim() != '') as boolean
+}
+
+export function generateUUID(): string {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        const r = (Math.random() * 16) | 0;
+        const v = c === 'x' ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+    });
 }

@@ -12,15 +12,20 @@ export const action: LoaderFunction = async ({ params, request }) => {
     switch(type){
         case 'get':{
             const user = await collection.findOne(res);
-            return json(user || {});
+            return json(user || {failed:true});
         }
         case 'getAll':{
             const users = await collection.find({}).toArray();
-            return json(users);
+            return json(users.length ? users : {failed:true});
         }
         case 'create':{
-            const user = await collection.findOne({username:{$regex:new RegExp(`^${res.username}$`, 'i')}});
-            if(user) return json({error:'Username already exists'});
+            if(col === 'users'){
+                const user = await collection.findOne({username:{$regex:new RegExp(`^${res.username}$`, 'i')}});
+                if(user) return json({failed:true, error:'username already exists'});
+            } else if(col === 'clans'){
+                const clan = await collection.findOne({name:{$regex:new RegExp(`^${res.name}$`, 'i')}});
+                if(clan) return json({failed:true, error:'clan name already exists'});
+            }
             const ins = await collection.insertOne(res);
             return json({success:ins.insertedId});
         }
@@ -30,11 +35,12 @@ export const action: LoaderFunction = async ({ params, request }) => {
             return json({success:upd.modifiedCount});
         }
         case 'updateAll':{
-            const upd = await collection.updateMany({}, {$set:res});
+            if(res.filter['_id']) res.filter['_id'] = new ObjectId(res.filter['_id']);
+            const upd = await collection.updateOne(res.filter, {$set:res.update});
             return json({success:upd.modifiedCount});
         }
         case 'delete':{
-            const del = await collection.deleteOne(res);
+            const del = await collection.deleteMany(res);
             return json({success:del.deletedCount});
         }
         case 'deleteAll':{

@@ -8,7 +8,6 @@ export default function Msgbox(props:{
 }){
     const time:number = Date.now() - props.message.time;
     const timeline:number = getTimeline(time, props.easeTime, props.easeTime, props.maxTime);
-    console.log(timeline);
     return (
         time > props.maxTime ? null :
         <div

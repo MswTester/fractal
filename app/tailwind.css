@@ -2,16 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
+*{
+    @apply box-border text-neutral-100 sm:text-sm md:text-base lg:text-lg;
+    font-family: 'Oswald', sans-serif;
+}
+
 html, body{
     width: 100vw;
     height: 100vh;
     @apply w-full h-full m-0 p-0 overflow-hidden bg-neutral-950 text-neutral-100;
 }
-*{
-    @apply box-border text-neutral-100;
+
+button{cursor: pointer;}
+button, input, select, textarea, .box{
+    border: 2px solid;
+    border-image-slice: 1;
+    border-image-source: linear-gradient(45deg, #ffdb63, #fff6e6, #ffce49);
+    box-shadow: 0 0 3px #ffdb63, inset 0 0 3px #ffdb63;
+    background: #191a1b;
+}
+button:disabled, input:disabled, select:disabled, textarea:disabled{opacity: 0.5;}
+input:focus, button:focus, select:focus, textarea:focus{
+    outline: none;
 }
 
-button{
-    background: #fff;
-    cursor: pointer;
-}
+.p{@apply sm:p-0.5 md:p-1 lg:p-1.5;}
+.r{@apply rounded-sm lg:rounded-md;}

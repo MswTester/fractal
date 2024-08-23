@@ -1,6 +1,6 @@
 import express from 'express'
 import { createServer } from 'http'
-import { Server } from 'socket.io'
+import { Server, Socket } from 'socket.io'
 import path from 'path'
 import dotenv from 'dotenv'
 import { MongoClient, WithId } from 'mongodb'
@@ -34,27 +34,25 @@ const main = async () => {
     io.on('connection', (socket) => {
         socket.on('logined', async (id:string) => {
             console.log('logined:', id);
+            await db.collection('users').updateOne({id}, {$set: {lastLogin: Date.now()}});
             socket.join(id);
         });
-        socket.on('disconnect', async () => {
-            if(socket.rooms.size > 0){
-                let id = '';
-                for(const room of socket.rooms){
-                    if(!room.startsWith('room:')){
-                        id = room;
-                        break;
-                    }
-                }
-                if(id){
-                    console.log('logout:', id);
-                    await db.collection('users').updateOne({id}, {$set: {lastLogout: Date.now()}});
-                }
+        socket.on('disconnecting', async () => {
+            const id = userIdOf(socket);
+            if(id){
+                console.log('logout:', id);
+                await db.collection('users').updateOne({id}, {$set: {lastLogout: Date.now()}});
             }
         });
     });
-    
+
     server.listen(PORT, () => {
         console.log(`Server is running on http://localhost:${PORT}`);
     });
 };
 main();
+
+function userIdOf(socket: Socket):string|null{
+    const id = Array.from(socket.rooms).find(room => room.length === 36 && room !== socket.id && room.split('-').length === 5);
+    return id || null;
+}

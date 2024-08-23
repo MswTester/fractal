@@ -3,15 +3,13 @@ export default class Room{
     name: string;
     players: IUser[]; // array of IUser
     ownerId: string;
-    ownerSocketId: string;
     maxPlayers: number;
     isPrivate: boolean;
-    constructor(id: string, name: string, owner:IUser, socketId:string, maxPlayers: number, isPrivate: boolean){
+    constructor(id: string, name: string, owner:IUser, maxPlayers: number, isPrivate: boolean){
         this.id = id;
         this.name = name;
         this.players = [owner];
         this.ownerId = owner.id;
-        this.ownerSocketId = "";
         this.maxPlayers = maxPlayers;
         this.isPrivate = isPrivate;
     }
@@ -40,10 +38,10 @@ export default class Room{
         return {
             id: this.id,
             name: this.name,
-            players: this.players.map(player => player.id),
+            players: this.players.map(p => p.id),
             ownerId: this.ownerId,
-            ownerSocketId: this.ownerSocketId,
             maxPlayers: this.maxPlayers,
+            isPrivate: this.isPrivate
         }
     }
 }

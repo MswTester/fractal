@@ -29,7 +29,7 @@ export default function Admin() {
         })
         const json:IUser = await res.json()
         setIsFetching(false)
-        if(json.username){
+        if(json.id){
             setUser(json)
         } else {
             setError('Invalid Username or Password')
@@ -43,9 +43,9 @@ export default function Admin() {
                 "clans":"name"
             }} />:
             <div className="flex flex-col justify-center items-center gap-3 w-48">
-                <input disabled={isFetching} className="p-2 rounded-md w-full" type="text" name="" id="" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)}/>
-                <input disabled={isFetching} className="p-2 rounded-md w-full" type="password" name="" id="" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)}/>
-                <button disabled={isFetching} className="p-2 rounded-md w-full" onClick={Login}>Login</button>
+                <input disabled={isFetching} className="p-2 w-full" type="text" name="" id="" placeholder="Username" value={username} onChange={e => {setUsername(e.target.value);setError('');}}/>
+                <input disabled={isFetching} className="p-2 w-full" type="password" name="" id="" placeholder="Password" value={password} onChange={e => {setPassword(e.target.value);setError('');}}/>
+                <button disabled={isFetching} className="p-2 w-full" onClick={Login}>Login</button>
                 <div className="w-full text-center text-red-500">{error}</div>
             </div>
             }
@@ -95,23 +95,23 @@ function Table (props:{
         <div className="w-full h-full flex flex-row justify-start items-center gap-3 overflow-hidden">
             <div className="flex flex-col justify-start items-center gap-2 p-2">
                 {Object.keys(res).map((key, i) => {
-                    return <button key={i} disabled={isFetching} className={`p-2 w-full rounded-md cursor-pointer ${selected === i ? 'bg-neutral-600' : 'bg-neutral-800'}`} onClick={e => setSelected(i)}>{key}</button>
+                    return <button key={i} disabled={isFetching} className={`p-2 w-full cursor-pointer ${selected === i ? 'bg-neutral-600' : 'bg-neutral-800'}`} onClick={e => setSelected(i)}>{key}</button>
                 })}
             </div>
             <div className="flex-1 h-full flex flex-col justify-center items-center overflow-hidden p-2 gap-2">
                 <div className="w-full flex flex-row justify-center items-center gap-2">
-                    <button disabled={isFetching} className="flex-1 p-2 rounded-md" onClick={refresh}>Refresh</button>
-                    <button disabled={isFetching} className="flex-1 p-2 rounded-md" onClick={e => {
+                    <button disabled={isFetching} className="flex-1 p-2" onClick={refresh}>Refresh</button>
+                    <button disabled={isFetching} className="flex-1 p-2" onClick={e => {
                         setTa(JSON.stringify({}, null, 2))
                         setOnTa("create")
                         setTarget("")
                     }}>Create</button>
-                    <button disabled={isFetching} className="flex-1 p-2 rounded-md" onClick={e => {
+                    <button disabled={isFetching} className="flex-1 p-2" onClick={e => {
                         setTa(JSON.stringify({}, null, 2))
                         setOnTa("modify")
                         setTarget("")
                     }}>Modify</button>
-                    <button disabled={isFetching} className="flex-1 p-2 rounded-md" onClick={e => {
+                    <button disabled={isFetching} className="flex-1 p-2" onClick={e => {
                         setTa(JSON.stringify([], null, 2))
                         setOnTa("delkeys")
                         setTarget("")
@@ -121,18 +121,18 @@ function Table (props:{
                     {Object.values(res)[selected] ? Object.values(res)[selected].map((items, i) => {
                         const col = Object.keys(res)[selected]
                         const id = props.collections[col]
-                        return <details key={i} className="bg-neutral-800 p-2 rounded-md cursor-pointer w-full">
+                        return <details key={i} className="bg-neutral-800 p-2 cursor-pointer w-full">
                             <summary className="flex flex-row justify-between items-center">
                                 <div className="text-lg font-bold">{items[id]}</div>
                                 <div className="flex flex-row justify-center items-center gap-2">
-                                    <button disabled={isFetching} className="p-2 rounded-md" onClick={e => {
+                                    <button disabled={isFetching} className="p-2" onClick={e => {
                                         let obj = {...items}
                                         delete obj["_id"]
                                         setTa(JSON.stringify(obj, null, 2))
                                         setTarget(items["_id"])
                                         setOnTa("edit")
                                     }}>Edit</button>
-                                    <button disabled={isFetching} className="p-2 rounded-md" onClick={e => {
+                                    <button disabled={isFetching} className="p-2" onClick={e => {
                                         setIsFetching(true)
                                         fetch(`/controller/col/${col}/type/delete`, {
                                             method:'POST',
@@ -156,9 +156,9 @@ function Table (props:{
             {onTa && <div className="absolute top-0 left-0 bg-[#0004] w-full h-full flex flex-col justify-center items-center" onMouseDown={e => {
                 if(e.target === e.currentTarget) closeTa()
             }}>
-                <div className="bg-[#fff9] p-2 rounded-md w-[80%] h-[80%] flex flex-col justify-center items-center gap-2">
-                    <textarea disabled={isFetching} className="w-full h-full p-2 rounded-md" value={ta} onChange={e => setTa(e.target.value)}></textarea>
-                    <button disabled={isFetching} className="p-2 rounded-md w-full" onClick={e => {
+                <div className="bg-[#fff9] p-2 w-[80%] h-[80%] flex flex-col justify-center items-center gap-2">
+                    <textarea disabled={isFetching} className="w-full h-full p-2" value={ta} onChange={e => setTa(e.target.value)}></textarea>
+                    <button disabled={isFetching} className="p-2 w-full" onClick={e => {
                         setIsFetching(true)
                         if(onTa === "create"){
                             fetch(`/controller/col/${Object.keys(res)[selected]}/type/create`, {
@@ -173,7 +173,7 @@ function Table (props:{
                             fetch(`/controller/col/${Object.keys(res)[selected]}/type/updateAll`, {
                                 method:'POST',
                                 headers:{'Content-Type':'application/json'},
-                                body:ta
+                                body:JSON.stringify({filter:{}, update:JSON.parse(ta)})
                             }).then(res => res.json()).then((json) => {
                                 closeTa()
                                 refresh()

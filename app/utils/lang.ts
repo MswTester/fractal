@@ -1,0 +1,186 @@
+const language:{[key:string]:{[key:string]:string}} = {
+    'login':{
+        'en':'Login',
+        'es':'Iniciar sesión',
+        'fr':'Connexion',
+        'de':'Anmeldung',
+        'it':'Accesso',
+        'pt':'Entrar',
+        'ru':'Вход',
+        'ja':'ログイン',
+        'ko':'로그인',
+        'zh':'登录'
+    },
+    'username':{
+        'en':'Username',
+        'es':'Nombre de usuario',
+        'fr':'Nom d\'utilisateur',
+        'de':'Nutzername',
+        'it':'Nome utente',
+        'pt':'Nome de usuário',
+        'ru':'Имя пользователя',
+        'ja':'ユーザー名',
+        'ko':'사용자 이름',
+        'zh':'用户名'
+    },
+    'password':{
+        'en':'Password',
+        'es':'Contraseña',
+        'fr':'Mot de passe',
+        'de':'Passwort',
+        'it':'Parola d\'ordine',
+        'pt':'Senha',
+        'ru':'Пароль',
+        'ja':'パスワード',
+        'ko':'비밀번호',
+        'zh':'密码'
+    },
+    'confirm password':{
+        'en':'Confirm Password',
+        'es':'Confirmar contraseña',
+        'fr':'Confirmer le mot de passe',
+        'de':'Passwort bestätigen',
+        'it':'Conferma password',
+        'pt':'Confirme a senha',
+        'ru':'Подтвердите пароль',
+        'ja':'パスワードを確認',
+        'ko':'비밀번호 확인',
+        'zh':'确认密码'
+    },
+    'register':{
+        'en':'Register',
+        'es':'Registrarse',
+        'fr':'S\'inscrire',
+        'de':'Registrieren',
+        'it':'Iscriviti',
+        'pt':'Registro',
+        'ru':'Регистрация',
+        'ja':'登録',
+        'ko':'회원가입',
+        'zh':'注册'
+    },
+    'goto register':{
+        'en':'Go to register',
+        'es':'Ir a registrarse',
+        'fr':'Aller à l\'inscription',
+        'de':'Zur Registrierung gehen',
+        'it':'Vai alla registrazione',
+        'pt':'Ir para o registro',
+        'ru':'Перейти к регистрации',
+        'ja':'登録に進む',
+        'ko':'회원가입으로',
+        'zh':'去注册'
+    },
+    'goto login':{
+        'en':'Go to login',
+        'es':'Ir a iniciar sesión',
+        'fr':'Aller à la connexion',
+        'de':'Zur Anmeldung gehen',
+        'it':'Vai al login',
+        'pt':'Ir para o login',
+        'ru':'Перейти к входу',
+        'ja':'ログインに進む',
+        'ko':'로그인으로',
+        'zh':'去登录'
+    },
+    'logout':{
+        'en':'Logout',
+        'es':'Cerrar sesión',
+        'fr':'Se déconnecter',
+        'de':'Ausloggen',
+        'it':'Disconnetters',
+        'pt':'Sair',
+        'ru':'Выйти',
+        'ja':'ログアウト',
+        'ko':'로그아웃',
+        'zh':'登出'
+    },
+    'failed to login':{
+        'en':'Failed to login',
+        'es':'Error al iniciar sesión',
+        'fr':'Échec de la connexion',
+        'de':'Anmeldung fehlgeschlagen',
+        'it':'Accesso fallito',
+        'pt':'Falha ao entrar',
+        'ru':'Ошибка входа',
+        'ja':'ログインに失敗しました',
+        'ko':'로그인에 실패했습니다',
+        'zh':'登录失败'
+    },
+    'failed to register':{
+        'en':'Failed to register',
+        'es':'Error al registrarse',
+        'fr':'Échec de l\'inscription',
+        'de':'Registrierung fehlgeschlagen',
+        'it':'Registrazione fallita',
+        'pt':'Falha ao registrar',
+        'ru':'Ошибка регистрации',
+        'ja':'登録に失敗しました',
+        'ko':'회원가입에 실패했습니다',
+        'zh':'注册失败'
+    },
+    'username already exists':{
+        'en':'Username already exists',
+        'es':'Nombre de usuario ya existe',
+        'fr':'Nom d\'utilisateur déjà existant',
+        'de':'Benutzername existiert bereits',
+        'it':'Nome utente già esistente',
+        'pt':'Nome de usuário já existe',
+        'ru':'Имя пользователя уже существует',
+        'ja':'ユーザー名はすでに存在します',
+        'ko':'사용자 이름이 이미 존재합니다',
+        'zh':'用户名已经存在'
+    },
+    'invalid username or password':{
+        'en':'Invalid username or password',
+        'es':'Nombre de usuario o contraseña inválidos',
+        'fr':'Nom d\'utilisateur ou mot de passe invalide',
+        'de':'Ungültiger Benutzername oder Passwort',
+        'it':'Nome utente o password non validi',
+        'pt':'Nome de usuário ou senha inválidos',
+        'ru':'Неверное имя пользователя или пароль',
+        'ja':'無効なユーザー名またはパスワード',
+        'ko':'잘못된 사용자 이름 또는 비밀번호',
+        'zh':'用户名或密码无效'
+    },
+    'invalid username':{
+        'en':'Invalid username',
+        'es':'Nombre de usuario inválido',
+        'fr':'Nom d\'utilisateur invalide',
+        'de':'Ungültiger Benutzername',
+        'it':'Nome utente non valido',
+        'pt':'Nome de usuário inválido',
+        'ru':'Неверное имя пользователя',
+        'ja':'無効なユーザー名',
+        'ko':'잘못된 사용자 이름',
+        'zh':'无效的用户名'
+    },
+    'invalid password':{
+        'en':'Invalid password',
+        'es':'Contraseña inválida',
+        'fr':'Mot de passe invalide',
+        'de':'Ungültiges Passwort',
+        'it':'Password non valida',
+        'pt':'Senha inválida',
+        'ru':'Неверный пароль',
+        'ja':'無効なパスワード',
+        'ko':'잘못된 비밀번호',
+        'zh':'无效的密码'
+    },
+    'passwords do not match':{
+        'en':'Passwords do not match',
+        'es':'Las contraseñas no coinciden',
+        'fr':'Les mots de passe ne correspondent pas',
+        'de':'Passwörter stimmen nicht überein',
+        'it':'Le password non corrispondono',
+        'pt':'Senhas não correspondem',
+        'ru':'Пароли не совпадают',
+        'ja':'パスワードが一致しません',
+        'ko':'비밀번호가 일치하지 않습니다',
+        'zh':'密码不匹配'
+    },
+}
+
+export const langOf = (lang:string, key:string) => {
+    return language[key] ? language[key][lang] || language[key]['en'] : key
+}

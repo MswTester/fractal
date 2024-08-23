@@ -10,6 +10,11 @@ interface IItem{
     effects: number[]; // item effects
 }
 
+interface IEquipment{
+    id: string; // equipped item uuid
+    slot: number; // equipped item slot
+}
+
 interface IUser {
     // default user structure
     id: string; // user uuid
@@ -26,8 +31,9 @@ interface IUser {
     coin: number;
     lastLogin: number;
     lastLogout: number;
-    unlockedItems: IItem[]; // unlocked items
-    unlockedSkills: number[]; // unlocked skills
+    items: IItem[]; // unlocked items
+    skills: number[]; // unlocked skills
+    equipments: IEquipment[]; // equipped items
 
     // achievements stats
     totalClear: number;

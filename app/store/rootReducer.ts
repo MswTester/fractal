@@ -3,6 +3,7 @@ interface storeAction {
     value: any;
 }
 const initialAppState = {
+    lang:'en',
     state:'login',
     isFetching:false,
     errors:[],

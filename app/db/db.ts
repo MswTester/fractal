@@ -18,7 +18,7 @@ async function connectToMongoDB(): Promise<void> {
 
 // 데이터베이스 객체 반환 함수
 function getMongoDB(): Db {
-  return client.db('tajago');
+  return client.db('fractal'); // 데이터베이스 이름으로 변경
 }
 
 export { connectToMongoDB, getMongoDB };
