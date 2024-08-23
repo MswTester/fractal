@@ -28,7 +28,7 @@ const main = async () => {
     const io = new Server(server, {cors: corsOptions});
 
     app.get('/', (req, res) => {
-        res.send('Server is running: ' + uri);
+        res.send('server is running');
     });
 
     io.on('connection', (socket) => {
