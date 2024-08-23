@@ -3,7 +3,7 @@ import { createServer } from 'http'
 import { Server, Socket } from 'socket.io'
 import path from 'path'
 import dotenv from 'dotenv'
-import { MongoClient, WithId } from 'mongodb'
+import { MongoClient, ObjectId } from 'mongodb'
 
 const rootDir = path.join(__dirname, '/../');
 const envPath = path.join(rootDir, '/.env');
@@ -11,9 +11,13 @@ dotenv.config({ path: envPath });
 console.log('envPath:', envPath);
 
 const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
+const client = new MongoClient(uri);
 
 const main = async () => {
+    await client.connect();
+    const db = client.db('fractal');
+    console.log('db connected:', uri);
     const app = express();
     const server = createServer(app);
     const corsOptions = {
@@ -22,13 +26,9 @@ const main = async () => {
         allowedHeaders: ['Access-Control-Allow-Origin']
     };
     const io = new Server(server, {cors: corsOptions});
-    const client = new MongoClient(uri);
-    console.log('uri:', uri);
-    await client.connect();
-    const db = client.db('fractal');
 
     app.get('/', (req, res) => {
-        res.send('Server is running');
+        res.send('Server is running: ' + uri);
     });
     
     io.on('connection', (socket) => {
