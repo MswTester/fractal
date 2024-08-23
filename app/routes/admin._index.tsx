@@ -4,16 +4,12 @@ import { checkName, checkPassword, sha256 } from "~/utils/auth";
 
 export const meta: MetaFunction = () => {
     return [
-        { title: "Tajago Admin" },
+        { title: "Admin Page" },
         { name: "description", content: "Admin Page" },
     ];
 };
 
 type Collection = {[key:string]:{[key:string]:any}[]}
-
-const collections:{[key:string]:string} = {
-    "users":"username"
-}
 
 export default function Admin() {
     const [user, setUser] = useState<IUser|null>(null)
@@ -42,7 +38,10 @@ export default function Admin() {
 
     return (
         <div className="w-full h-full flex flex-col justify-center items-center">
-            {user?.admin ? <Table />:
+            {user?.admin ? <Table collections={{
+                "users":"username",
+                "clans":"name"
+            }} />:
             <div className="flex flex-col justify-center items-center gap-3 w-48">
                 <input disabled={isFetching} className="p-2 rounded-md w-full" type="text" name="" id="" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)}/>
                 <input disabled={isFetching} className="p-2 rounded-md w-full" type="password" name="" id="" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)}/>
@@ -54,7 +53,9 @@ export default function Admin() {
     );
 }
 
-function Table (){
+function Table (props:{
+    collections:{[key:string]:string}
+}){
     const [once, setOnce] = useState<boolean>(false)
     const [res, setRes] = useState<Collection>({})
     const [selected, setSelected] = useState<number>(0)
@@ -68,7 +69,7 @@ function Table (){
         const res = fetch('/getAll', {
             method:'POST',
             headers:{'Content-Type':'application/json'},
-            body:JSON.stringify(Object.keys(collections))
+            body:JSON.stringify(Object.keys(props.collections))
         })
         res.then(res => res.json()).then((json:Collection) => {
             setRes(json)
@@ -119,7 +120,7 @@ function Table (){
                 <div className="w-full h-full flex flex-col justify-start items-center gap-2 overflow-y-auto overflow-x-hidden">
                     {Object.values(res)[selected] ? Object.values(res)[selected].map((items, i) => {
                         const col = Object.keys(res)[selected]
-                        const id = collections[col]
+                        const id = props.collections[col]
                         return <details key={i} className="bg-neutral-800 p-2 rounded-md cursor-pointer w-full">
                             <summary className="flex flex-row justify-between items-center">
                                 <div className="text-lg font-bold">{items[id]}</div>

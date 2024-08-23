@@ -1,15 +1,8 @@
 import { MongoClient, Db } from 'mongodb';
-import path from 'path'
-import dotenv from 'dotenv'
-
-const rootDir = path.join(__dirname, '/../')
-const envPath = path.join(rootDir, '/.env')
-dotenv.config({ path: envPath })
 
 // MongoDB 연결 문자열 (MongoDB URI)
 const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017'; // 본인의 MongoDB URI로 변경
-
-
+console.log('uri:', uri);
 // MongoDB 클라이언트 생성
 const client = new MongoClient(uri);
 
