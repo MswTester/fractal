@@ -187,7 +187,6 @@ function Table (props:{
                                 closeTa()
                                 refresh()
                             })
-                        
                         } else if(onTa === "edit") {
                             fetch(`/controller/col/${Object.keys(res)[selected]}/type/update`, {
                                 method:'POST',

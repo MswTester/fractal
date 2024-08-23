@@ -1,3 +1,8 @@
+interface IMessage{
+    message:string;
+    time:number;
+}
+
 interface IItem{
     id: string; // item uuid
     tag: string; // item tag

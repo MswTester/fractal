@@ -12,6 +12,16 @@ import { RemixServer } from "@remix-run/react";
 import { isbot } from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
 
+import path from 'path'
+import dotenv from 'dotenv'
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const envPath = path.join(__dirname, '/../', '/.env');
+
+dotenv.config({ path: envPath });
+
 const ABORT_DELAY = 5_000;
 
 export default function handleRequest(

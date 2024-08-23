@@ -3,10 +3,10 @@ interface storeAction {
     value: any;
 }
 const initialAppState = {
-    page:'login',
+    state:'login',
     isFetching:false,
-    error:'',
-    alert:'',
+    errors:[],
+    alerts:[],
     user:null,
     selectedUser:null,
     homeState:'play',

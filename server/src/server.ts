@@ -3,7 +3,7 @@ import { createServer } from 'http'
 import { Server } from 'socket.io'
 import path from 'path'
 import dotenv from 'dotenv'
-import { MongoClient } from 'mongodb'
+import { MongoClient, WithId } from 'mongodb'
 
 const rootDir = path.join(__dirname, '/../');
 const envPath = path.join(rootDir, '/.env');
@@ -25,16 +25,35 @@ const main = async () => {
     const client = new MongoClient(uri);
     console.log('uri:', uri);
     await client.connect();
+    const db = client.db('fractal');
 
     app.get('/', (req, res) => {
-      res.send('Server is running');
+        res.send('Server is running');
     });
     
     io.on('connection', (socket) => {
-      console.log('a user connected');
+        socket.on('logined', async (id:string) => {
+            console.log('logined:', id);
+            socket.join(id);
+        });
+        socket.on('disconnect', async () => {
+            if(socket.rooms.size > 0){
+                let id = '';
+                for(const room of socket.rooms){
+                    if(!room.startsWith('room:')){
+                        id = room;
+                        break;
+                    }
+                }
+                if(id){
+                    console.log('logout:', id);
+                    await db.collection('users').updateOne({id}, {$set: {lastLogout: Date.now()}});
+                }
+            }
+        });
     });
     
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
         console.log(`Server is running on http://localhost:${PORT}`);
     });
 };
