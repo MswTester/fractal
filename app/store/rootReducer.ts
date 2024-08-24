@@ -10,7 +10,7 @@ const initialAppState = {
     alerts:[],
     user:null,
     selectedUser:null,
-    homeState:'play',
+    homeState:'lobby',
     isMatching:false,
     room:null,
 };

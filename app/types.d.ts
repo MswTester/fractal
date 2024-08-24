@@ -3,15 +3,54 @@ interface IMessage{
     time:number;
 }
 
+interface IDisplayRoom{
+    id: string; // room uuid
+    name: string; // room name
+    ownerName: string; // room owner name
+    ownerLvl: number; // room owner level
+    mode: number; // room mode
+    map: number; // room map
+    players: number; // room players
+    maxPlayer: number; // room max player
+}
+
+interface IRoom{
+    id: string; // room uuid
+    name: string; // room name
+    players: IDisplayUser[]; // room players
+    ownerId: string; // room owner id
+    maxPlayers: number; // room max players
+    isPrivate: boolean; // room privacy
+    map: number; // room map
+    mode: number; // room mode
+}
+
+interface IDisplayUser{
+    id: string; // user uuid
+    username: string; // user name
+    avatar: string; // user avatar
+    lvl: number; // user level
+    equipments: IEquipment[]; // user equipment
+}
+
+interface IRune{
+    id: string; // rune uuid
+    tag: string; // rune tag
+    lvl: number; // rune level
+}
+
 interface IItem{
     id: string; // item uuid
     tag: string; // item tag
     lvl: number; // item level
-    effects: number[]; // item effects
+    exp: number; // item experience
+    skilled: number[]; // item skilled
+    runes: IRune[]; // item runes
 }
 
 interface IEquipment{
     id: string; // equipped item uuid
+    tag: string; // equipped item tag
     slot: number; // equipped item slot
 }
 

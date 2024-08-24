@@ -5,6 +5,8 @@ export default class Room{
     ownerId: string;
     maxPlayers: number;
     isPrivate: boolean;
+    map: number;
+    mode: number;
     constructor(id: string, name: string, owner:IUser, maxPlayers: number, isPrivate: boolean){
         this.id = id;
         this.name = name;
@@ -12,18 +14,19 @@ export default class Room{
         this.ownerId = owner.id;
         this.maxPlayers = maxPlayers;
         this.isPrivate = isPrivate;
+        this.map = 0;
+        this.mode = 0;
     }
-    addPlayer(player: IUser){
+    join(player: IUser){
         if(this.players.length < this.maxPlayers){
             this.players.push(player);
             return true;
         }
         return false;
     }
-    removePlayer(player: IUser){
-        const index = this.players.indexOf(player);
-        if(index > -1){
-            this.players.splice(index, 1);
+    leave(player: string){
+        if(this.players.length > 0){
+            this.players = this.players.filter(p => p.id !== player);
             return true;
         }
         return false;
@@ -34,14 +37,36 @@ export default class Room{
     isEmpty(){
         return this.players.length === 0;
     }
-    serialize(){
+    serialize():IRoom{
         return {
             id: this.id,
             name: this.name,
-            players: this.players.map(p => p.id),
+            players: this.players.map(player => {
+                return {
+                    id: player.id,
+                    username: player.username,
+                    avatar: player.avatar,
+                    lvl: player.lvl,
+                    equipments: player.equipments
+                } as IDisplayUser
+            }),
             ownerId: this.ownerId,
             maxPlayers: this.maxPlayers,
-            isPrivate: this.isPrivate
+            isPrivate: this.isPrivate,
+            map: this.map,
+            mode: this.mode
+        }
+    }
+    getDisplay():IDisplayRoom{
+        return {
+            id: this.id,
+            name: this.name,
+            ownerName: this.players[0].username,
+            ownerLvl: this.players[0].lvl,
+            mode: this.mode,
+            map: this.map,
+            players: this.players.length,
+            maxPlayer: this.maxPlayers
         }
     }
 }

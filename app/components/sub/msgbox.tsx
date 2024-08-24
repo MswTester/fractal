@@ -1,4 +1,4 @@
-import { getTimeline } from "~/utils/ease";
+import { easeInQuad, getTimeline } from "~/utils/ease";
 
 export default function Msgbox(props:{
     message:IMessage;
@@ -7,7 +7,7 @@ export default function Msgbox(props:{
     easeTime:number;
 }){
     const time:number = Date.now() - props.message.time;
-    const timeline:number = getTimeline(time, props.easeTime, props.easeTime, props.maxTime);
+    const timeline:number = easeInQuad(getTimeline(time, props.easeTime, props.easeTime, props.maxTime));
     return (
         time > props.maxTime ? null :
         <div

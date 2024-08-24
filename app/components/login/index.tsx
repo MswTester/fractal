@@ -1,17 +1,28 @@
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux"
+import { Socket } from "socket.io-client";
 import { checkName, checkPassword, generateUUID, sha256 } from "~/utils/auth";
 import { useCompset } from "~/utils/compset";
+import { useOnce } from "~/utils/hooks";
 
-export default function Login() {
-    const {patch, useOnce, isFetching, addAlert, addError, lng} = useCompset()
+export default function Login(props:{
+    socket: Socket
+}) {
+    const {patch, isFetching, addAlert, addError, lng} = useCompset()
 
     const [state, setState] = useState<string>('login')
     const [username, setUsername] = useState<string>('')
     const [password, setPassword] = useState<string>('')
     const [confirm, setConfirm] = useState<string>('')
 
-    const tryLogin = async (name:string, pass:string) => {
+    const logined = (user:IUser) => {
+        localStorage.setItem('user', JSON.stringify({name:user.username, pass:user.password}))
+        props.socket.emit('logined', user.id)
+        patch('user', user)
+        patch('state', 'home')
+    }
+
+    // Try to login with username and password
+    const tryLogin = async (name:string, pass:string, sha:boolean = true) => {
         if(!checkName(name)) return addError(lng('invalid username'))
         if(!checkPassword(pass)) return addError(lng('invalid password'))
         patch('isFetching', true)
@@ -20,18 +31,18 @@ export default function Login() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({username:name, password:sha256(pass)})
+            body: JSON.stringify({username:name, password:sha ? sha256(pass) : pass})
         })
         const data = await res.json()
         if(data.failed){
             addError(lng('invalid username or password'))
         } else {
-            patch('user', data)
-            patch('state', 'home')
+            logined(data)
         }
         patch('isFetching', false)
     }
 
+    // Try to register with username, password, and confirm password
     const tryRegister = async (name:string, pass:string, conf:string) => {
         if(!checkName(name)) return addError(lng('invalid username'))
         if(!checkPassword(pass)) return addError(lng('invalid password'))
@@ -77,13 +88,21 @@ export default function Login() {
         if(data.failed){
             addError(lng('username already exists'))
         } else if(data.success){
-            patch('user', newUser)
-            patch('state', 'home')
+            logined(newUser)
         } else {
             addError(lng('failed to register'))
         }
         patch('isFetching', false)
     }
+
+    // Check if user is already logged in
+    useOnce(() => {
+        const user = localStorage.getItem('user')
+        if(user){
+            const {name, pass} = JSON.parse(user)
+            tryLogin(name, pass, false)
+        }
+    })
 
     return <main className="w-full h-full flex flex-col justify-center items-center sm:gap-0.5 gap-1 md:gap-1.5 lg:gap-2">
         <input disabled={isFetching} className="sm:w-48 md:w-56 lg:w-64 text-center p" type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder={lng('username')} />
@@ -100,7 +119,13 @@ export default function Login() {
             }}
         >{lng(state === 'login' ? 'login' : 'register')}</button>
         <div className="md:text-sm lg:text-base underline cursor-pointer select-none"
-            onClick={() => setState(state === 'login' ? 'register' : 'login')}
+            onClick={() => {
+                if(isFetching) return
+                setState(state === 'login' ? 'register' : 'login')
+                setUsername('');
+                setPassword('');
+                setConfirm('');
+            }}
         >{lng(state === 'login' ? 'goto register' : 'goto login')}</div>
     </main>
 }

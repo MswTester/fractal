@@ -7,12 +7,13 @@ import { useInterval } from "usehooks-ts";
 import Login from "./login";
 import { useCompset } from "~/utils/compset";
 import Home from "./home";
+import { useOnce } from "~/utils/hooks";
 
 export const isDev:boolean = process.env.NODE_ENV === 'development'
 const url = isDev ? 'http://127.0.0.1:8080' : 'https://fractal-d6jf.onrender.com'
 
 export default function Main() {
-    const {patch, useOnce, isFetching, addAlert, addError, lng} = useCompset()
+    const {patch, isFetching, addAlert, addError, lng} = useCompset()
     const alerts:IMessage[] = useSelector((state:any) => state.alerts);
     const errors:IMessage[] = useSelector((state:any) => state.errors);
     const state:string = useSelector((state:any) => state.state);
@@ -30,6 +31,19 @@ export default function Main() {
             sock.on('error', (err:string) => {
                 addError(err)
             })
+            sock.on('disconnect', () => {
+                addError('Disconnected from socket server')
+            })
+            sock.on('reconnect', () => {
+                addAlert('Reconnected to socket server')
+            })
+            sock.on('kick', (reason:string) => {
+                localStorage.removeItem('user')
+                addError(reason)
+                patch('state', 'login')
+                patch('user', null)
+                patch('room', null)
+            })
             return () => {
                 sock.disconnect()
                 sock.close()
@@ -41,7 +55,7 @@ export default function Main() {
 
     return <>{
         socket != null ? (
-            state === 'login' ? <Login /> :
+            state === 'login' ? <Login socket={socket} /> :
             state === 'home' ? <Home socket={socket} /> :
             state === 'play' ? <></> :
             <div className="w-full h-full flex justify-center items-center sm:text-sm md:text-base lg:text-lg">Page not found</div>

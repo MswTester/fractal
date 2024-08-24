@@ -58,5 +58,5 @@ export function easeOutBounce(x: number): number {
 export function easeInOutBounce(x: number): number {return x < 0.5 ? (1 - easeOutBounce(1 - 2 * x)) / 2 : (1 + easeOutBounce(2 * x - 1)) / 2;}
 
 export function getTimeline(cur:number, minAmount:number, maxAmount:number, total:number){
-    return cur < minAmount ? 1 - cur / minAmount : cur > total - maxAmount ? 1 - (total - cur) / maxAmount : 0;
+    return cur < minAmount ? 1 - cur / minAmount : cur > total - maxAmount ? 1 - (total - cur) / maxAmount : cur > total ? 1 : 0;
 }

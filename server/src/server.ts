@@ -4,6 +4,7 @@ import { Server, Socket } from 'socket.io'
 import path from 'path'
 import dotenv from 'dotenv'
 import { MongoClient, ObjectId } from 'mongodb'
+import Room from '../../shared/room'
 
 const rootDir = path.join(__dirname.replaceAll('src', '').replace('dist', ''), '../');
 const envPath = path.join(rootDir, '/.env');
@@ -13,6 +14,9 @@ console.log('envPath:', envPath);
 const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
 const PORT = process.env.PORT || 8080;
 const client = new MongoClient(uri);
+
+let rooms:Room[] = [];
+const showingRooms = () => rooms.filter(room => !room.isPrivate).map(room => room.getDisplay());
 
 const main = async () => {
     await client.connect();
@@ -32,7 +36,24 @@ const main = async () => {
     });
 
     io.on('connection', (socket) => {
+        const destroyConnection = (id:string) => {
+            const room = rooms.find(room => room.players.find(player => player.id === id));
+            if(room){
+                room.leave(id);
+                socket.leave(room.id);
+                if(room.ownerId === id){
+                    io.to(room.id).emit('roomDestroyed', 'Room owner left the room');
+                    rooms = rooms.filter(r => r.id !== room.id);
+                } else {
+                    io.to(room.id).emit('roomUpdated', room.serialize());
+                }
+                socket.broadcast.emit('rooms', showingRooms());
+            }
+        }
         socket.on('logined', async (id:string) => {
+            io.to(id).emit('kick', 'You are logged in from another device');
+            destroyConnection(id);
+            io.to(id).socketsLeave(id);
             console.log('logined:', id);
             await db.collection('users').updateOne({id}, {$set: {lastLogin: Date.now()}});
             socket.join(id);
@@ -40,8 +61,48 @@ const main = async () => {
         socket.on('disconnecting', async () => {
             const id = userIdOf(socket);
             if(id){
+                // destroy connection
+                destroyConnection(id);
+                
                 console.log('logout:', id);
                 await db.collection('users').updateOne({id}, {$set: {lastLogout: Date.now()}});
+            }
+        });
+
+        // Room System
+        socket.on('getRooms', () => {socket.emit('rooms', showingRooms())})
+        socket.on('createRoom', (user:IUser, name:string, maxPlayers:number, isPrivate:boolean, callback:(err:string, room:IRoom) => void) => {
+            const id = new ObjectId().toHexString();
+            const room = new Room(id, name, user, maxPlayers, isPrivate);
+            rooms.push(room);
+            socket.join(id);
+            socket.broadcast.emit('rooms', showingRooms());
+            callback('', room.serialize());
+        });
+        socket.on('joinRoom', (id:string, user:IUser, callback:(err:string, room:IRoom|null) => void) => {
+            const room = rooms.find(room => room.id === id);
+            if(room){
+                if(room.isFull()){
+                    callback('room is full', null);
+                } else {
+                    room.join(user);
+                    socket.join(id);
+                    socket.broadcast.emit('rooms', showingRooms());
+                    callback('', room.serialize());
+                }
+            }else{
+                callback('room not found', null);
+            }
+        });
+        socket.on('leaveRoom', (id:string, userId:string, callback:(err:string, room:IRoom|null) => void) => {
+            const room = rooms.find(room => room.id === id);
+            if(room){
+                room.leave(userId);
+                socket.leave(id);
+                socket.broadcast.emit('rooms', showingRooms());
+                callback('', room.serialize());
+            }else{
+                callback('Room not found', null);
             }
         });
     });

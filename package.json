@@ -17,6 +17,7 @@
     "@remix-run/react": "^2.11.2",
     "@remix-run/serve": "^2.11.2",
     "isbot": "^4.1.0",
+    "lucide-react": "^0.435.0",
     "mongodb": "^6.8.0",
     "pixi.js": "^8.3.3",
     "react": "^18.2.0",
