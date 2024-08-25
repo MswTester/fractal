@@ -1,17 +1,26 @@
 import Entity from "./entity";
-import Map from "./map";
+import Structure from "./structure";
 
 export default class Instance{
-    id: string;
-    players: IUser[]; // array of IUser
-    ownerId: string;
-    map:Map;
-    entities: Entity[];
+    private _id: string; // room's uuid
+    private _players: IUser[]; // array of IUser
+    private _ownerId: string;
+    private _entities: Entity[] = [];
+    private _structures: Structure[] = [];
+    private _time: number = 0;
+    private _state: GameState = GameState.WAITING;
     constructor(id: string, players: IUser[], ownerId:string){
-        this.id = id;
-        this.players = players;
-        this.ownerId = ownerId;
-        this.map = new Map("default");
-        this.entities = [];
+        this._id = id;
+        this._players = players;
+        this._ownerId = ownerId;
+    }
+
+    tick(delta: number){
+        // tick entities
+        this._entities.forEach(entity => entity.tick(delta));
+        // tick structures
+        this._structures.forEach(structure => structure.tick(delta));
+
+        this._time += delta;
     }
 }

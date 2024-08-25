@@ -18,7 +18,7 @@ export default function RoomCreation(props:{
             addError(lng('invalid room name'));
             return;
         }
-        if(maxPlayers < 2 || maxPlayers > 8){
+        if(maxPlayers < 2 || maxPlayers > 6){
             addError(lng('invalid max players'));
             return;
         }
@@ -46,7 +46,7 @@ export default function RoomCreation(props:{
             <input
                 type="number"
                 value={maxPlayers}
-                onChange={e => setMaxPlayers(Math.max(Math.min(parseInt(e.target.value), 8), 2))}
+                onChange={e => setMaxPlayers(Math.max(Math.min(parseInt(e.target.value), 6), 2))}
                 className="w-12 bg-neutral-700 text-neutral-100 p-1 lg:p-2 border border-white"
             />
         </div>

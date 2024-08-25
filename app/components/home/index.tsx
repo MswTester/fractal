@@ -4,6 +4,7 @@ import { Socket } from "socket.io-client";
 import { useCompset } from "~/utils/compset";
 import Lobby from "./lobby/lobby";
 import Navbar from "./navbar";
+import Room from "./room/room";
 
 export default function Home(props:{
     socket: Socket
@@ -21,12 +22,15 @@ export default function Home(props:{
             filter: 'blur(10px)',
             transform: 'scale(1.1)'
         }}></div>
-        {room ? <div className="flex flex-col w-full h-full justify-center items-center overflow-hidden absolute left-0 top-0">
-            
-        </div> :
         <div className="flex flex-col w-full h-full justify-center items-center overflow-hidden absolute left-0 top-0">
-            <Navbar />
-            {homeState === 'lobby' ? <Lobby socket={props.socket} /> : <></>}
-        </div>}
+        {room ? <Room socket={props.socket} /> : <>
+                <Navbar />
+                {
+                    homeState === 'lobby' ? <Lobby socket={props.socket} /> :
+                    <></>
+                }
+            </>
+        }
+        </div>
     </main>
 }

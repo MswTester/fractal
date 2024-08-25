@@ -1,5 +1,7 @@
+import { ObjectId } from "mongodb";
+
 export default class Room{
-    id: string;
+    readonly id: string = new ObjectId().toHexString(); // uuid
     name: string;
     players: IUser[]; // array of IUser
     ownerId: string;
@@ -7,8 +9,7 @@ export default class Room{
     isPrivate: boolean;
     map: number;
     mode: number;
-    constructor(id: string, name: string, owner:IUser, maxPlayers: number, isPrivate: boolean){
-        this.id = id;
+    constructor(name: string, owner:IUser, maxPlayers: number, isPrivate: boolean){
         this.name = name;
         this.players = [owner];
         this.ownerId = owner.id;
@@ -34,8 +35,11 @@ export default class Room{
     isFull(){
         return this.players.length === this.maxPlayers;
     }
-    isEmpty(){
-        return this.players.length === 0;
+    setMap(map: number){
+        this.map = map;
+    }
+    setMode(mode: number){
+        this.mode = mode;
     }
     serialize():IRoom{
         return {
@@ -57,7 +61,7 @@ export default class Room{
             mode: this.mode
         }
     }
-    getDisplay():IDisplayRoom{
+    get display():IDisplayRoom{
         return {
             id: this.id,
             name: this.name,

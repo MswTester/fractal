@@ -25,14 +25,14 @@ export default function Lobby(props:{
         {/* My Profile */}
         <div className='flex flex-col w-full h-full justify-center sm:p-24 md:p-28 lg:p-32'>
             {/* Character Img */}
-            <CharacterView equipments={user.equipments} />
+            <CharacterView className="w-full sm:h-64 md:h-72 lg:h-96" equipments={user.equipments} />
             {/* Profile Card */}
             <ProfileCard user={user} />
         </div>
         {/* Rooms */}
-        <div className='w-full h-full sm:p-1 md:p-1.5 lg:p-2 flex flex-col justify-center items-center sm:gap-1 md:gap-1.5 lg:gap-2'>
+        <div className='w-full h-full sm:p-1 md:p-1.5 lg:p-2 flex flex-col justify-center items-center sm:gap-1 md:gap-1.5 lg:gap-2 overflow-hidden'>
             {/* Room List Card */}
-            <div className='flex flex-col rounded-md bg-[#000a] border border-white w-full h-full flex-1'>
+            <div className='flex flex-col rounded-md bg-[#000a] border border-white w-full h-full flex-1 overflow-hidden'>
                 {/* Title */}
                 <div className='sm:p-2 md:p-3 lg:p-4 text-center under sm:text-base md:text-lg lg:text-xl w-full'>{lng('rooms')}</div>
                 {/* Room List */}
@@ -40,7 +40,7 @@ export default function Lobby(props:{
                     {rooms.map((room, index) => (
                         <div key={index}
                             className='flex justify-between items-center cursor-pointer select-none w-full under sm:p-1 md:p-1 lg:p-1.5 sm:gap-1 md:gap-1 lg:gap-1.5 hover:bg-[#fff1]'
-                            onClick={e => props.socket.emit('joinRoom', room.id, (err:string, room:IRoom) => {
+                            onClick={e => props.socket.emit('joinRoom', room.id, user, (err:string, room:IRoom) => {
                                 if(err) addError(err)
                                 else patch('room', room)
                             })}

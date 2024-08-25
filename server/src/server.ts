@@ -16,7 +16,7 @@ const PORT = process.env.PORT || 8080;
 const client = new MongoClient(uri);
 
 let rooms:Room[] = [];
-const showingRooms = () => rooms.filter(room => !room.isPrivate).map(room => room.getDisplay());
+const showingRooms = () => rooms.filter(room => !room.isPrivate).map(room => room.display);
 
 const main = async () => {
     await client.connect();
@@ -71,11 +71,14 @@ const main = async () => {
 
         // Room System
         socket.on('getRooms', () => {socket.emit('rooms', showingRooms())})
-        socket.on('createRoom', (user:IUser, name:string, maxPlayers:number, isPrivate:boolean, callback:(err:string, room:IRoom) => void) => {
-            const id = new ObjectId().toHexString();
-            const room = new Room(id, name, user, maxPlayers, isPrivate);
+        socket.on('createRoom', (user:IUser, name:string, maxPlayers:number, isPrivate:boolean, callback:(err:string, room:IRoom|null) => void) => {
+            if(maxPlayers < 2 || maxPlayers > 6){
+                callback('Invalid max players', null);
+                return;
+            }
+            const room = new Room(name, user, maxPlayers, isPrivate);
             rooms.push(room);
-            socket.join(id);
+            socket.join(room.id);
             socket.broadcast.emit('rooms', showingRooms());
             callback('', room.serialize());
         });
@@ -87,6 +90,7 @@ const main = async () => {
                 } else {
                     room.join(user);
                     socket.join(id);
+                    io.to(room.id).emit('roomUpdated', room.serialize());
                     socket.broadcast.emit('rooms', showingRooms());
                     callback('', room.serialize());
                 }
@@ -94,15 +98,49 @@ const main = async () => {
                 callback('room not found', null);
             }
         });
-        socket.on('leaveRoom', (id:string, userId:string, callback:(err:string, room:IRoom|null) => void) => {
+        socket.on('leaveRoom', (id:string, callback:(err:string) => void) => {
             const room = rooms.find(room => room.id === id);
+            const userId = userIdOf(socket);
             if(room){
+                if(!userId) return callback('User not found');
                 room.leave(userId);
                 socket.leave(id);
+                if(room.ownerId === userId){
+                    io.to(room.id).emit('roomDestroyed', 'Room owner left the room');
+                    rooms = rooms.filter(r => r.id !== room.id);
+                } else {
+                    io.to(room.id).emit('roomUpdated', room.serialize());
+                }
                 socket.broadcast.emit('rooms', showingRooms());
-                callback('', room.serialize());
+                callback('');
             }else{
-                callback('Room not found', null);
+                callback('Room not found');
+            }
+        });
+        socket.on('chat', (id:string, chat:string) => {
+            const room = rooms.find(room => room.id === id);
+            if(room){
+                const userId = userIdOf(socket);
+                const user = room.players.find(player => player.id === userId)
+                if(user){
+                    io.to(room.id).emit('chat', `[${user.username}] ${chat}`);
+                }
+            }
+        });
+        socket.on('changeMap', (id:string, map:number) => {
+            const room = rooms.find(room => room.id === id);
+            if(room){
+                if(room.ownerId !== userIdOf(socket)) return;
+                room.setMap(map);
+                io.to(room.id).emit('roomUpdated', room.serialize());
+            }
+        });
+        socket.on('changeMode', (id:string, mode:number) => {
+            const room = rooms.find(room => room.id === id);
+            if(room){
+                if(room.ownerId !== userIdOf(socket)) return;
+                room.setMode(mode);
+                io.to(room.id).emit('roomUpdated', room.serialize());
             }
         });
     });

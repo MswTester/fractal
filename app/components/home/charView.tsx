@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
-import { useWindowSize } from "usehooks-ts";
 
 export default function CharacterView(props:{
+    className?:string;
     equipments:IEquipment[];
 }){
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -39,5 +39,5 @@ export default function CharacterView(props:{
             window.removeEventListener('resize', resizeCanvas);
         }
     }, [props.equipments])
-    return <canvas className="w-full h-full" ref={canvasRef}></canvas>
+    return <canvas className={props.className} ref={canvasRef}></canvas>
 }

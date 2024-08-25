@@ -359,6 +359,42 @@ const language:{[key:string]:{[key:string]:string}} = {
         'ko':'방을 찾을 수 없습니다',
         'zh':'找不到房间'
     },
+    'chat messages':{
+        'en':'Chat messages',
+        'es':'Mensajes de chat',
+        'fr':'Messages de chat',
+        'de':'Chatnachrichten',
+        'it':'Messaggi di chat',
+        'pt':'Mensagens de bate-papo',
+        'ru':'Сообщения чата',
+        'ja':'チャットメッセージ',
+        'ko':'채팅 메시지',
+        'zh':'聊天消息'
+    },
+    'leave':{
+        'en':'Leave',
+        'es':'Dejar',
+        'fr':'Partir',
+        'de':'Verlassen',
+        'it':'Partire',
+        'pt':'Sair',
+        'ru':'Покинуть',
+        'ja':'去る',
+        'ko':'나가기',
+        'zh':'离开'
+    },
+    'start':{
+        'en':'Start',
+        'es':'Comienzo',
+        'fr':'Début',
+        'de':'Start',
+        'it':'Inizio',
+        'pt':'Começo',
+        'ru':'Старт',
+        'ja':'開始',
+        'ko':'시작',
+        'zh':'开始'
+    },
 }
 
 export const langOf = (lang:string, key:string) => {
