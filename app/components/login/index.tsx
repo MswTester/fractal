@@ -64,6 +64,7 @@ export default function Login(props:{
             items: [],
             skills: [],
             equipments: [],
+            friends: [],
 
             totalClear: 0,
             totalFail: 0,

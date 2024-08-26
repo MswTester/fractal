@@ -73,6 +73,7 @@ interface IUser {
     items: IItem[]; // unlocked items
     skills: number[]; // unlocked skills
     equipments: IEquipment[]; // equipped items
+    friends: string[]; // friends id
 
     // achievements stats
     totalClear: number;

@@ -48,6 +48,6 @@ export default function Home(props:{
             </>
         }
         </div>
-        {onSocial && <Social socket={props.socket} />}
+        {onSocial && <Social socket={props.socket} close={() => setOnSocial(false)} />}
     </main>
 }
