@@ -54,9 +54,9 @@ const main = async () => {
             io.to(id).emit('kick', 'You are logged in from another device');
             destroyConnection(id);
             io.to(id).socketsLeave(id);
-            console.log('logined:', id);
             await db.collection('users').updateOne({id}, {$set: {lastLogin: Date.now()}});
             socket.join(id);
+            console.log('logined:', id);
         });
         socket.on('disconnecting', async () => {
             const id = userIdOf(socket);
@@ -64,8 +64,8 @@ const main = async () => {
                 // destroy connection
                 destroyConnection(id);
                 
-                console.log('logout:', id);
                 await db.collection('users').updateOne({id}, {$set: {lastLogout: Date.now()}});
+                console.log('logout:', id);
             }
         });
 
