@@ -18,6 +18,10 @@ export default abstract class World{
     abstract readonly maxWave: number;
     abstract readonly width: number;
     abstract readonly height: number;
+    abstract readonly spawnX: number;
+    abstract readonly spawnY: number;
+    abstract readonly waves: IWaveEnemy[][];
+    abstract readonly environment: IEnvironment[];
     
     private readonly _id: string = new ObjectId().toHexString();
     constructor(){this.initialize()}

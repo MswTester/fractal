@@ -9,6 +9,7 @@ export default class Instance{
     private _structures: Structure[] = [];
     private _time: number = 0;
     private _state: GameState = GameState.WAITING;
+    private _wave: number = 0;
     constructor(id: string, players: IUser[], ownerId:string){
         this._id = id;
         this._players = players;

@@ -133,6 +133,7 @@ const main = async () => {
                 if(room.ownerId !== userIdOf(socket)) return;
                 room.setMap(map);
                 io.to(room.id).emit('roomUpdated', room.serialize());
+                socket.broadcast.emit('rooms', showingRooms());
             }
         });
         socket.on('changeMode', (id:string, mode:number) => {
@@ -141,6 +142,7 @@ const main = async () => {
                 if(room.ownerId !== userIdOf(socket)) return;
                 room.setMode(mode);
                 io.to(room.id).emit('roomUpdated', room.serialize());
+                socket.broadcast.emit('rooms', showingRooms());
             }
         });
     });

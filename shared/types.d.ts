@@ -6,3 +6,13 @@ enum GameState{
     WAITING,
     RUNNING,
 }
+
+interface IEnvironment{
+    type: string;
+    amount: number;
+}
+
+interface IWaveEnemy{
+    type: string;
+    amount: number;
+}
