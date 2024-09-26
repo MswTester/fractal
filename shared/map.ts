@@ -1,4 +1,4 @@
-import { ObjectId } from "mongodb";
+import { generateObjectUUID } from "./utils/auth";
 
 export default abstract class World{
     private static registry: Map<string, new () => World> = new Map();
@@ -23,7 +23,7 @@ export default abstract class World{
     abstract readonly waves: IWaveEnemy[][];
     abstract readonly environment: IEnvironment[];
     
-    private readonly _id: string = new ObjectId().toHexString();
+    private readonly _id: string = generateObjectUUID();
     constructor(){this.initialize()}
     private initialize() {
     }

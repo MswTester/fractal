@@ -1,7 +1,7 @@
-import { ObjectId } from "mongodb";
+import { generateObjectUUID } from "./utils/auth";
 
 export default class Room{
-    readonly id: string = new ObjectId().toHexString(); // uuid
+    readonly id: string = generateObjectUUID(); // room's uuid
     name: string;
     players: IUser[]; // array of IUser
     ownerId: string;

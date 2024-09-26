@@ -1,4 +1,4 @@
-import { ObjectId } from "mongodb";
+import { generateObjectUUID } from "./utils/auth";
 
 export default abstract class Structure{
     private static registry: Map<string, new () => Structure> = new Map();
@@ -17,7 +17,7 @@ export default abstract class Structure{
     abstract readonly tag: string;
     abstract readonly maxHealth: number;
     
-    private readonly _id: string = new ObjectId().toHexString();
+    private readonly _id: string = generateObjectUUID();
     private _health: number = 0;
     private _x: number = 0;
     private _y: number = 0;
