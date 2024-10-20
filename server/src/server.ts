@@ -145,6 +145,47 @@ const main = async () => {
                 socket.broadcast.emit('rooms', showingRooms());
             }
         });
+
+        // Inventory System
+        socket.on('equipItem', async (itemId:string, slot:number, callback:(err:string) => void) => {
+            const userId = userIdOf(socket);
+            if(!userId) return;
+            const user = await db.collection('users').findOne({id: userId});
+            if(user){
+                const item = user.items.find(item => item.id === itemId);
+                if(item){
+                    const equipped = user.equipments.find(equip => equip.slot === slot);
+                    if(equipped){
+                        user.equipments = user.equipments.map(equip => equip.slot === slot ? {id: item.id, tag: item.tag, slot} : equip);
+                    } else {
+                        user.equipments.push({id: item.id, tag: item.tag, slot});
+                    }
+                    await db.collection('users').updateOne({id: userId}, {$set: {equipments: user.equipments}});
+                    io.to(userId).emit('equipmentsUpdated', user.equipments);
+                } else {
+                    callback('Item not found');
+                }
+            } else {
+                callback('User not found');
+            }
+        });
+        socket.on('unequipItem', async (itemId:string, callback:(err:string) => void) => {
+            const userId = userIdOf(socket);
+            if(!userId) return;
+            const user = await db.collection('users').findOne({id: userId});
+            if(user){
+                const item = user.items.find(item => item.id === itemId);
+                if(item){
+                    user.equipments = user.equipments.filter(equip => equip.id !== item.id);
+                    await db.collection('users').updateOne({id: userId}, {$set: {equipments: user.equipments}});
+                    io.to(userId).emit('equipmentsUpdated', user.equipments);
+                } else {
+                    callback('Item not found');
+                }
+            } else {
+                callback('User not found');
+            }
+        });
     });
 
     server.listen(PORT, () => {

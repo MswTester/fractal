@@ -44,9 +44,14 @@ export default function Main() {
                 patch('user', null)
                 patch('room', null)
             })
+            const contextMenu = (e:MouseEvent) => {
+                e.preventDefault()
+            }
+            window.addEventListener('contextmenu', contextMenu)
             return () => {
                 sock.disconnect()
                 sock.close()
+                window.removeEventListener('contextmenu', contextMenu)
             }
         } catch(err){
             addError('Failed to connect to socket server')

@@ -7,6 +7,7 @@ import Navbar from "./navbar";
 import Room from "./room/room";
 import Social from "./social";
 import { useOnce } from "~/utils/hooks";
+import Profile from "./profile/profile";
 
 export default function Home(props:{
     socket: Socket
@@ -43,6 +44,7 @@ export default function Home(props:{
                 <Navbar />
                 {
                     homeState === 'lobby' ? <Lobby socket={props.socket} /> :
+                    homeState === 'profile' ? <Profile socket={props.socket} /> :
                     <></>
                 }
             </>

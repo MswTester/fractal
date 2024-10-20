@@ -62,7 +62,7 @@ export default function Login(props:{
             lastLogin: Date.now(),
             lastLogout: Date.now(),
             items: [],
-            skills: [],
+            runes: [],
             equipments: [],
             friends: [],
 

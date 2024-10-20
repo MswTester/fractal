@@ -44,7 +44,7 @@ interface IItem{
     tag: string; // item tag
     lvl: number; // item level
     exp: number; // item experience
-    skilled: number[]; // item skilled
+    skills: number[]; // item skill levels
     runes: IRune[]; // item runes
 }
 
@@ -60,8 +60,8 @@ interface IUser {
     username: string; // user name
     password: string; // user password
     avatar: string; // data:image/png;base64
-    admin: boolean;
-    banned: boolean;
+    admin: boolean; // user admin
+    banned: boolean; // user banned
 
     // user stats
     lvl: number;
@@ -70,8 +70,8 @@ interface IUser {
     coin: number;
     lastLogin: number;
     lastLogout: number;
-    items: IItem[]; // unlocked items
-    skills: number[]; // unlocked skills
+    items: IItem[]; // items
+    runes: IRune[]; // runes
     equipments: IEquipment[]; // equipped items
     friends: string[]; // friends id
 
