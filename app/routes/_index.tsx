@@ -6,7 +6,7 @@ import Main from "../components/main";
 export const meta: MetaFunction = () => {
   return [
     { title: "Fractal" },
-    { name: "description", content: "" },
+    { name: "description", content: "Shards you have." },
   ];
 };
 
