@@ -14,8 +14,8 @@ export default abstract class Structure{
         }
     }
 
-    abstract readonly tag: string;
-    abstract readonly maxHealth: number;
+    abstract tag: string;
+    abstract maxHealth: number;
     
     private readonly _id: string = generateObjectUUID();
     private _health: number = 0;

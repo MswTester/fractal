@@ -14,14 +14,14 @@ export default abstract class World{
         }
     }
 
-    abstract readonly tag: string;
-    abstract readonly maxWave: number;
-    abstract readonly width: number;
-    abstract readonly height: number;
-    abstract readonly spawnX: number;
-    abstract readonly spawnY: number;
-    abstract readonly waves: IWaveEnemy[][];
-    abstract readonly environment: IEnvironment[];
+    abstract tag: string;
+    abstract maxWave: number;
+    abstract width: number;
+    abstract height: number;
+    abstract spawnX: number;
+    abstract spawnY: number;
+    abstract waves: IWaveEnemy[][];
+    abstract environment: IEnvironment[];
     
     private readonly _id: string = generateObjectUUID();
     constructor(){this.initialize()}

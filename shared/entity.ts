@@ -1,8 +1,8 @@
 import { generateObjectUUID } from "./utils/auth";
 
 export default abstract class Entity{
-    private static registry: Map<string, new () => Entity> = new Map();
-    static register(tag: string, entity: new () => Entity){
+    private static registry: Map<string, new (...args:any[]) => Entity> = new Map();
+    static register(tag: string, entity: new (...args:any[]) => Entity){
         Entity.registry.set(tag, entity);
     }
     static create(tag: string):Entity {
@@ -14,10 +14,10 @@ export default abstract class Entity{
         }
     }
 
-    abstract readonly tag: string;
-    abstract readonly maxHealth: number;
-    abstract readonly damage: number;
-    abstract readonly speed: number;
+    abstract tag: string;
+    abstract maxHealth: number;
+    abstract damage: number;
+    abstract speed: number;
     
     private readonly _id: string = generateObjectUUID();
     private _health: number = 0;

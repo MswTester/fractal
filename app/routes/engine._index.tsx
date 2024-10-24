@@ -1,5 +1,6 @@
 import { MetaFunction } from "@remix-run/node";
 import { useEffect, useState } from "react";
+import App from "~/components/engine";
 import { checkName, checkPassword, sha256 } from "~/utils/auth";
 import { useOnce } from "~/utils/hooks";
 
@@ -37,7 +38,7 @@ export default function Engine() {
 
     return (
         <div className="w-full h-full flex flex-col justify-center items-center">
-            {user?.admin ? <Editor />:
+            {user?.admin ? <App map="f" user={user} />:
             <div className="flex flex-col justify-center items-center gap-3 w-48">
                 <input disabled={isFetching} className="p-2 w-full" type="text" name="" id="" placeholder="Username" value={username} onChange={e => {setUsername(e.target.value);setError('');}}/>
                 <input disabled={isFetching} className="p-2 w-full" type="password" name="" id="" placeholder="Password" value={password} onChange={e => {setPassword(e.target.value);setError('');}}/>
@@ -54,14 +55,6 @@ function Editor() {
     useOnce(() => {
     })
 
-    return (
-        <div>
-            Engine
-        </div>
-    );
-}
-
-function Render(){
     return (
         <div>
             Engine

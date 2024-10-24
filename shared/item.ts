@@ -16,11 +16,11 @@ export default abstract class Item{
 
     abstract readonly tag: string;
     // 공격형 아이템 속성 (대개)
-    abstract readonly damage: number; // amount
-    abstract readonly criticalChance: number; // float
-    abstract readonly criticalDamage: number; // float (multiplier)
-    abstract readonly knockback: number; // amount
-    abstract readonly cooldown: number; // ms
+    abstract damage: number; // amount
+    abstract criticalChance: number; // float
+    abstract criticalDamage: number; // float (multiplier)
+    abstract knockback: number; // amount
+    abstract cooldown: number; // ms
     
     private readonly _id: string = generateObjectUUID();
     private _mainDown: boolean = false;
