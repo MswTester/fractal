@@ -2,17 +2,22 @@ type vec2 = [number, number];
 type vec3 = [number, number, number];
 type vec4 = [number, number, number, number];
 
-enum GameState{
-    WAITING,
-    RUNNING,
-}
-
 interface IEnvironment{
     type: string;
     amount: number;
 }
 
+interface 
+
 interface IWaveEnemy{
-    type: string;
+    tag: string; // Entity tag
     amount: number;
+    spawn: number; // spawnZone index
+}
+
+interface IZone{
+    x: number;
+    y: number;
+    width: number;
+    height: number;
 }

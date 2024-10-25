@@ -18,8 +18,10 @@ export default abstract class World{
     abstract maxWave: number;
     abstract width: number;
     abstract height: number;
-    abstract spawnX: number;
-    abstract spawnY: number;
+    abstract tiles: string[]; // tile assets url/path
+    abstract tileMap: number[][]; // tileMap[y][x] = tileIndex of World.tiles
+    abstract playerSpawn: IZone;
+    abstract enemySpawn: IZone[];
     abstract waves: IWaveEnemy[][];
     abstract environment: IEnvironment[];
     
@@ -30,6 +32,6 @@ export default abstract class World{
     get id():string{return this._id};
 
     tick(delta: number){
-        // do nothing
+        // do something
     }
 }

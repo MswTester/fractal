@@ -2,6 +2,8 @@ import { Application, Assets, Container, Sprite } from "pixi.js";
 import { useRef, useState } from "react";
 import Player from "~/entities/player";
 import Entity from "~/entity";
+import Instance from "~/instance";
+import { generateUUID } from "~/utils/auth";
 import { useOnce } from "~/utils/hooks";
 
 export default function App(props:{
@@ -10,31 +12,27 @@ export default function App(props:{
 }) {
     const appRef = useRef<HTMLDivElement>(null)
     const [assetsLoaded, setAssetsLoaded] = useState<boolean>(false)
-    const [keymap, setKeymap] = useState<string[]>([])
     
     useOnce(async () => {
-        const app = new Application();
-        await app.init({
-            backgroundColor: 0x1099bb,
-            resizeTo: window,
-        })
+        const instance = new Instance(generateUUID(), [props.user], props.user.id);
+
+        await instance.init(window)
         await Assets.load([
+            "/assets/entities/player.svg",
             "/assets/test/heartsping.webp",
             "/assets/test/gogoping.webp",
         ])
-        appRef.current?.appendChild(app.canvas)
+        appRef.current?.appendChild(instance.app.canvas)
         setAssetsLoaded(true)
-        
-        let _keymap:string[] = [];
-        let _camera = new Container();
-        let _entityList:Entity[] = [];
-        const resize = () => {
-            _camera.position.set(app.screen.width / 2, app.screen.height / 2);
-        };
-        resize();
-        app.stage.addChild(_camera);
         const myChar = new Player();
         myChar.equip(props.user.equipments);
+        myChar.sprite = new Sprite({
+            texture: Assets.get(`/assets/entities/${myChar.tag}.svg`),
+            anchor: {x:0.5, y:0.5},
+            position: {x:0, y:0},
+            width: 100,
+            height: 100,
+        })
 
         const heart = new Sprite(Assets.get("/assets/test/heartsping.webp"))
         heart.anchor.set(0.5)
@@ -46,43 +44,29 @@ export default function App(props:{
         gogo.setSize(100, 100)
         gogo.position.set(0, 0)
 
-        _camera.addChild(heart)
-        _camera.addChild(gogo)
-
-        const keydown = (e: KeyboardEvent) => {
-            if (!_keymap.includes(e.key)) {
-                _keymap.push(e.key)
-                setKeymap(_keymap)
-            }
-        }
-        const keyup = (e: KeyboardEvent) => {
-            _keymap = _keymap.filter(key => key !== e.key)
-            setKeymap(_keymap)
-        }
-
-        app.ticker.add((ticker) => {
-            if (_keymap.includes("w")) {
+        instance.addTicker((ticker) => {
+            if (instance.isDown("w")) {
                 heart.y -= ticker.deltaTime
             }
-            if (_keymap.includes("s")) {
+            if (instance.isDown("s")) {
                 heart.y += ticker.deltaTime
             }
-            if (_keymap.includes("a")) {
+            if (instance.isDown("a")) {
                 heart.x -= ticker.deltaTime
             }
-            if (_keymap.includes("d")) {
+            if (instance.isDown("d")) {
                 heart.x += ticker.deltaTime
             }
         })
 
-        window.addEventListener("resize", resize)
-        window.addEventListener("keydown", keydown)
-        window.addEventListener("keyup", keyup)
+        window.addEventListener("resize", instance.resize)
+        window.addEventListener("keydown", instance.keydown)
+        window.addEventListener("keyup", instance.keyup)
         return () => {
-            app.destroy();
-            window.removeEventListener("resize", resize)
-            window.removeEventListener("keydown", keydown)
-            window.removeEventListener("keyup", keyup)
+            instance.destroy();
+            window.removeEventListener("resize", instance.resize)
+            window.removeEventListener("keydown", instance.keydown)
+            window.removeEventListener("keyup", instance.keyup)
         }
     })
 

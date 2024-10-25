@@ -1,3 +1,4 @@
+import { Sprite, Container } from "pixi.js";
 import { generateObjectUUID } from "./utils/auth";
 
 export default abstract class Structure{
@@ -16,19 +17,16 @@ export default abstract class Structure{
 
     abstract tag: string;
     abstract maxHealth: number;
-    
+
     private readonly _id: string = generateObjectUUID();
+    private _sprite: Sprite | Container | null = null;
     private _health: number = 0;
-    private _x: number = 0;
-    private _y: number = 0;
     constructor(){this.initialize()}
     private initialize() {
         this._health = this.maxHealth;
     }
     get id():string{return this._id};
     get health():number{return this._health};
-    get position():vec2{return [this._x, this._y]};
-    set position(value:vec2){[this._x, this._y] = value};
 
     tick(delta: number){
         // do nothing

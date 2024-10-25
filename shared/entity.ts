@@ -1,3 +1,4 @@
+import { Container, Sprite } from "pixi.js";
 import { generateObjectUUID } from "./utils/auth";
 
 export default abstract class Entity{
@@ -20,17 +21,17 @@ export default abstract class Entity{
     abstract speed: number;
     
     private readonly _id: string = generateObjectUUID();
+    private _sprite: Sprite | Container | null = null;
     private _health: number = 0;
-    private _x: number = 0;
-    private _y: number = 0;
     constructor(){this.initialize()}
     private initialize() {
         this._health = this.maxHealth;
     }
     get id():string{return this._id};
     get health():number{return this._health};
-    get position():vec2{return [this._x, this._y]};
-    set position(value:vec2){[this._x, this._y] = value};
+    set health(value:number){this._health = value};
+    get sprite():Sprite|Container{return this._sprite as (Sprite | Container)};
+    set sprite(sprite:Sprite|Container){this._sprite = sprite};
 
     tick(delta: number){
         // do nothing
