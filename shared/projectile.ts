@@ -19,7 +19,7 @@ export default abstract class Projectile{
     abstract maxHealth: number;
     abstract damage: number;
     abstract speed: number;
-    
+
     private readonly _id: string = generateObjectUUID();
     private _health: number = 0;
     private _damage: number = 0;

@@ -114,6 +114,25 @@ function Astar(props: { user: IUser }) {
                     { x: 600, y: 300, width: 100, height: 100 },
                 ];
 
+                const isCollision = (line:Line):boolean => {
+                    for (let i = 0; i < obstacles.length; i++) {
+                        const obstacle = obstacles[i];
+                        const lines = [
+                            { start: { x: obstacle.x, y: obstacle.y }, end: { x: obstacle.x + obstacle.width, y: obstacle.y } },
+                            { start: { x: obstacle.x + obstacle.width, y: obstacle.y }, end: { x: obstacle.x + obstacle.width, y: obstacle.y + obstacle.height } },
+                            { start: { x: obstacle.x + obstacle.width, y: obstacle.y + obstacle.height }, end: { x: obstacle.x, y: obstacle.y + obstacle.height } },
+                            { start: { x: obstacle.x, y: obstacle.y + obstacle.height }, end: { x: obstacle.x, y: obstacle.y } },
+                        ];
+                        for (let j = 0; j < lines.length; j++) {
+                            if (doSegmentsIntersect(line, lines[j])) return true;
+                        }
+                    }
+                    for (let i = 0; i < nodes.length; i++) {
+                        if (dist(nodes[i], line.start, line.end) < R) return true;
+                    }
+                    return false;
+                }
+
                 let path: { x: number; y: number }[] = [];
                 let nodes: { x: number; y: number }[] = [];
 
@@ -122,16 +141,23 @@ function Astar(props: { user: IUser }) {
                     createNodes();
                     console.log(nodes);
                     path = [];
+                    console.log(isCollision({start:target, end:destination}));
+                    if(!isCollision({start:target, end:destination})){
+                        path.push(destination);
+                    } else {
+
+                    }
                 };
 
                 const createNodes = () => {
                     nodes = [];
+                    const _R = R * Math.sqrt(2)/2;
                     obstacles.forEach((obstacle) => {
                         nodes.push(
-                            { x: obstacle.x - R, y: obstacle.y - R },
-                            { x: obstacle.x + obstacle.width + R, y: obstacle.y - R },
-                            { x: obstacle.x + obstacle.width + R, y: obstacle.y + obstacle.height + R },
-                            { x: obstacle.x - R, y: obstacle.y + obstacle.height + R },
+                            { x: obstacle.x - _R, y: obstacle.y - _R },
+                            { x: obstacle.x + obstacle.width + _R, y: obstacle.y - _R },
+                            { x: obstacle.x + obstacle.width + _R, y: obstacle.y + obstacle.height + _R },
+                            { x: obstacle.x - _R, y: obstacle.y + obstacle.height + _R },
                         );
                     });
                 }
@@ -158,10 +184,11 @@ function Astar(props: { user: IUser }) {
                     });
 
                     // Draw path (green line)
+                    ctx.lineWidth = 2;
                     if (path.length) {
                         ctx.beginPath();
-                        ctx.strokeStyle = 'green';
-                        ctx.moveTo(path[0].x, path[0].y);
+                        ctx.strokeStyle = 'aqua';
+                        ctx.moveTo(target.x, target.y);
                         path.forEach((p) => {
                             ctx.lineTo(p.x, p.y);
                         });
@@ -172,7 +199,7 @@ function Astar(props: { user: IUser }) {
                     nodes.forEach((node) => {
                         ctx.fillStyle = 'yellow';
                         ctx.beginPath();
-                        ctx.arc(node.x, node.y, 4, 0, Math.PI * 2);
+                        ctx.arc(node.x, node.y, R, 0, Math.PI * 2);
                         ctx.fill();
                     });
 
