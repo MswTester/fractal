@@ -128,30 +128,74 @@ function Astar(props: { user: IUser }) {
                             if (doSegmentsIntersect(line, lines[j])) return true;
                         }
                     }
-                    for (let i = 0; i < nodes.length; i++) {
-                        if (dist(nodes[i], line.start, line.end) < R) return true;
+                    const filtered = nodes.filter(node => {
+                        return node.x !== line.start.x && node.y !== line.start.y && node.x !== line.end.x && node.y !== line.end.y
+                        && node.x > Math.min(line.start.x, line.end.x) && node.x < Math.max(line.start.x, line.end.x)
+                    });
+                    for (let i = 0; i < filtered.length; i++) {
+                        if (dist(filtered[i], line.start, line.end) < R) return true;
                     }
                     return false;
                 }
 
-                let path: { x: number; y: number }[] = [];
-                let nodes: { x: number; y: number }[] = [];
+                let path: Point[] = [];
+                let nodes: Point[] = [];
 
                 // dynamic A* pathfinding
                 const findPath = () => {
                     createNodes();
-                    console.log(nodes);
                     path = [];
-                    console.log(isCollision({start:target, end:destination}));
-                    if(!isCollision({start:target, end:destination})){
-                        path.push(destination);
-                    } else {
-                        let current = target;
-                        getFilteredNodes(current).forEach(node => {
-                            path.push(node);
-                        });
+                    const result = findShortestPathAStar(target, destination);
+                    if (result) {
+                        path = result.path.slice(1);
                     }
                 };
+
+                type PointDist = {
+                    point: Point,
+                    distance: number,
+                    path: Point[]
+                }
+
+                type Node = {
+                    point: Point,
+                    distance: number,
+                    path: Point[]
+                }
+                
+                function findShortestPathAStar(start: Point, dest: Point): PointDist | null {
+                    const openSet: Node[] = [{ point: start, distance: 0, path: [start] }];
+                    const visited: Set<string> = new Set();
+                
+                    while (openSet.length > 0) {
+                        // 현재까지의 최소 거리 노드를 선택
+                        openSet.sort((a, b) => a.distance - b.distance);  // 우선순위 큐 대체 (최적화 여지)
+                        const { point: current, distance, path } = openSet.shift()!;
+                        if (visited.has(`${current.x},${current.y}`)) continue;
+                        visited.add(`${current.x},${current.y}`);
+                
+                        // 목적지에 도달 시 결과 반환
+                        if (!isCollision({ start: current, end: dest })) {
+                            return { point: dest, distance: distance + getDistance(current, dest), path: [...path, dest] };
+                        }
+                
+                        // 인접 노드를 탐색하여 우선순위 큐에 추가
+                        for (const neighbor of getFilteredNodes(current)) {
+                            if (!visited.has(`${neighbor.x},${neighbor.y}`)) {
+                                openSet.push({
+                                    point: neighbor,
+                                    distance: distance + getDistance(current, neighbor) + getDistance(neighbor, dest), // g + h
+                                    path: [...path, neighbor]
+                                });
+                            }
+                        }
+                    }
+                    return null;
+                }                
+
+                function getDistance(p1:Point, p2:Point):number{
+                    return Math.sqrt((p1.x - p2.x)**2 + (p1.y - p2.y)**2);
+                }
 
                 function getFilteredNodes(p:Point):Point[]{
                     return nodes.filter(node => !isCollision({start:p, end:node}))
@@ -159,7 +203,7 @@ function Astar(props: { user: IUser }) {
 
                 const createNodes = () => {
                     nodes = [];
-                    const _R = R * Math.sqrt(2)/2;
+                    const _R = R * Math.sqrt(2)/2 + 1;
                     obstacles.forEach((obstacle) => {
                         nodes.push(
                             { x: obstacle.x - _R, y: obstacle.y - _R },
@@ -169,6 +213,13 @@ function Astar(props: { user: IUser }) {
                         );
                     });
                 }
+
+                let effects:{
+                    p:Point; // position
+                    c:string; // color
+                    t:number; // start time
+                    d:number; // duration
+                }[] = [];
 
                 const render = () => {
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -192,42 +243,82 @@ function Astar(props: { user: IUser }) {
                     });
 
                     // Draw path (green line)
-                    ctx.lineWidth = 2;
-                    if (path.length) {
-                        ctx.beginPath();
-                        ctx.strokeStyle = 'aqua';
-                        ctx.moveTo(target.x, target.y);
-                        path.forEach((p) => {
-                            ctx.lineTo(p.x, p.y);
-                        });
-                        ctx.stroke();
-                    }
+                    // ctx.lineWidth = 2;
+                    // if (path.length) {
+                    //     ctx.beginPath();
+                    //     ctx.strokeStyle = 'aqua';
+                    //     ctx.moveTo(target.x, target.y);
+                    //     path.forEach((p) => {
+                    //         ctx.lineTo(p.x, p.y);
+                    //     });
+                    //     ctx.stroke();
+                    // }
 
                     // Draw nodes (yellow circles)
-                    nodes.forEach((node) => {
-                        ctx.fillStyle = 'yellow';
+                    // nodes.forEach((node) => {
+                    //     ctx.fillStyle = 'yellow';
+                    //     ctx.beginPath();
+                    //     ctx.arc(node.x, node.y, R, 0, Math.PI * 2);
+                    //     ctx.fill();
+                    // });
+
+                    // Draw effects
+                    effects = effects.filter(effect => {
+                        return Date.now() - effect.t < effect.d;
+                    });
+                    effects.forEach(effect => {
+                        ctx.fillStyle = effect.c;
+                        ctx.globalAlpha = 1 - (Date.now() - effect.t) / effect.d;
                         ctx.beginPath();
-                        ctx.arc(node.x, node.y, R, 0, Math.PI * 2);
+                        ctx.arc(effect.p.x, effect.p.y, 5, 0, Math.PI * 2);
                         ctx.fill();
                     });
 
+                    // Move AI
+                    if (path.length) {
+                        const next = path[0];
+                        const dx = next.x - target.x;
+                        const dy = next.y - target.y;
+                        const angle = Math.atan2(dy, dx);
+                        const speed = 2;
+                        target.x += Math.cos(angle) * speed;
+                        target.y += Math.sin(angle) * speed;
+                        findPath();
+                    }
+
                     requestAnimationFrame(render); // Loop the rendering
                 };
+
+                const flashPoints = (ps:Point[], color:string, ms:number) => {
+                    ps.forEach(p => {
+                        effects.push({p, c:color, t:Date.now(), d:ms});
+                    });
+                }
 
                 render();
 
                 // Update the destination on canvas click
                 canvas.addEventListener('mousedown', (e) => {
+                    if(e.button === 1){
                     destination.x = e.offsetX;
                     destination.y = e.offsetY;
-                    findPath(); // Recalculate the path on destination change
+                    findPath();
+                    } else if(e.button === 2){
+                        obstacles.push({x:e.offsetX, y:e.offsetY, width:1, height:1});
+                    }
                 });
                 canvas.addEventListener('mousemove', (e) => {
                     if (e.buttons === 1) {
                         destination.x = e.offsetX;
                         destination.y = e.offsetY;
-                        findPath(); // Recalculate the path on destination change
+                    } else if (e.buttons === 2) {
+                        const obstacle = obstacles[obstacles.length - 1];
+                        obstacle.width = e.offsetX - obstacle.x;
+                        obstacle.height = e.offsetY - obstacle.y;
                     }
+                });
+                canvas.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
                 });
 
                 // Handle canvas resize
