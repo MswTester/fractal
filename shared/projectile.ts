@@ -21,7 +21,6 @@ export default abstract class Projectile{
     abstract speed: number;
     
     private readonly _id: string = generateObjectUUID();
-    private _sprite: Sprite | Container | null = null;
     private _health: number = 0;
     private _damage: number = 0;
     private _speed: number = 0;
@@ -33,17 +32,9 @@ export default abstract class Projectile{
     get id():string{return this._id};
     get health():number{return this._health};
     set health(value:number){this._health = value};
-    get sprite():Sprite|Container{return this._sprite as (Sprite | Container)};
-    set sprite(sprite:Sprite|Container){this._sprite = sprite};
 
     tick(delta: number){
         this.health -= delta/1000;
-        if(this.health <= 0){
-            this.destroy();
-        }
-    }
-
-    destroy(){
-        this.sprite.destroy();
+        if(this.health <= 0) this.health = 0;
     }
 }

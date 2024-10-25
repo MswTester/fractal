@@ -22,7 +22,6 @@ export default abstract class Entity{
     abstract dScale: Point;
     
     private readonly _id: string = generateObjectUUID();
-    private _sprite: Sprite | Container | null = null;
     private _health: number = 0;
     private _position: Point = {x: 0, y: 0};
     private _velocity: Point = {x: 0, y: 0};
@@ -33,8 +32,6 @@ export default abstract class Entity{
         this._health = this.maxHealth;
     }
     get id():string{return this._id};
-    get sprite():Sprite|Container{return this._sprite as (Sprite | Container)};
-    set sprite(sprite:Sprite|Container){this._sprite = sprite};
     get health():number{return this._health};
     set health(value:number){this._health = value};
     get position():Point{return this._position};
@@ -69,15 +66,19 @@ export default abstract class Entity{
 
     tick(delta: number){
         const deltaSeconds = delta/1000;
+        if(this._velocity.x >= this.dSpeed){this._velocity.x = this.dSpeed;}
+        if(this._velocity.x <= -this.dSpeed){this._velocity.x = -this.dSpeed;}
+        if(this._velocity.y >= this.dSpeed){this._velocity.y = this.dSpeed;}
+        if(this._velocity.y <= -this.dSpeed){this._velocity.y = -this.dSpeed;}
         this._position.x += this._velocity.x * deltaSeconds;
         this._position.y += this._velocity.y * deltaSeconds;
-        if(this._velocity.x >= this.dSpeed){this._velocity.x = this.dSpeed;}
-        if(this._velocity.y >= this.dSpeed){this._velocity.y = this.dSpeed;}
+        this._velocity.x > 0 ? this._velocity.x -= this.dSpeed * deltaSeconds : this._velocity.x += this.dSpeed * deltaSeconds;
+        this._velocity.y > 0 ? this._velocity.y -= this.dSpeed * deltaSeconds : this._velocity.y += this.dSpeed * deltaSeconds;
     }
 
     move(angle: number){
-        this._velocity.x += this.dSpeed * Math.cos(angle) / 10;
-        this._velocity.y += this.dSpeed * Math.sin(angle) / 10;
+        this._velocity.x += this.dSpeed * Math.cos(angle) / 2;
+        this._velocity.y += this.dSpeed * Math.sin(angle) / 2;
     }
 }
 

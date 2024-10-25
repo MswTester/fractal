@@ -1,8 +1,8 @@
-import { Application, Assets, Container, Sprite } from "pixi.js";
+import { Assets, Sprite } from "pixi.js";
 import { useRef, useState } from "react";
 import Player from "~/entities/player";
-import Entity from "~/entity";
 import Instance from "~/instance";
+import Controller from "~/logic/controller";
 import { generateUUID } from "~/utils/auth";
 import { useOnce } from "~/utils/hooks";
 
@@ -15,24 +15,18 @@ export default function App(props:{
     
     useOnce(async () => {
         const instance = new Instance(generateUUID(), [props.user], props.user.id);
+        const controller = new Controller();
 
-        await instance.init(window)
+        await controller.init(window)
         await Assets.load([
             "/assets/entities/player.svg",
             "/assets/test/heartsping.webp",
             "/assets/test/gogoping.webp",
         ])
-        appRef.current?.appendChild(instance.app.canvas)
+        appRef.current?.appendChild(controller.app.canvas)
         setAssetsLoaded(true)
         const myChar = new Player();
         myChar.equip(props.user.equipments);
-        myChar.sprite = new Sprite({
-            texture: Assets.get(`/assets/entities/${myChar.tag}.svg`),
-            anchor: {x:0.5, y:0.5},
-            position: {x:0, y:0},
-            width: instance.tileSize,
-            height: 100,
-        })
         instance.addEntity(myChar);
 
         const heart = new Sprite(Assets.get("/assets/test/heartsping.webp"))
@@ -45,29 +39,33 @@ export default function App(props:{
         gogo.setSize(100, 100)
         gogo.position.set(0, 0)
 
-        instance.addTicker((ticker) => {
-            if (instance.isDown("w")) {
+        controller.addTicker((ticker) => {
+            if (controller.isDown("w")) {
+                myChar.move(0);
                 heart.y -= ticker.deltaTime
             }
-            if (instance.isDown("s")) {
+            if (controller.isDown("s")) {
+                myChar.move(Math.PI/2);
                 heart.y += ticker.deltaTime
             }
-            if (instance.isDown("a")) {
+            if (controller.isDown("a")) {
+                myChar.move(Math.PI/4*3);
                 heart.x -= ticker.deltaTime
             }
-            if (instance.isDown("d")) {
+            if (controller.isDown("d")) {
+                myChar.move(Math.PI/4);
                 heart.x += ticker.deltaTime
             }
         })
 
-        window.addEventListener("resize", instance.resize)
-        window.addEventListener("keydown", instance.keydown)
-        window.addEventListener("keyup", instance.keyup)
+        controller.addResizeEvent(window)
+        controller.addKeydownEvent(document)
+        controller.addKeyupEvent(document)
         return () => {
-            instance.destroy();
-            window.removeEventListener("resize", instance.resize)
-            window.removeEventListener("keydown", instance.keydown)
-            window.removeEventListener("keyup", instance.keyup)
+            controller.destroy();
+            controller.removeResizeEvent(window)
+            controller.removeKeydownEvent(document)
+            controller.removeKeyupEvent(document)
         }
     })
 

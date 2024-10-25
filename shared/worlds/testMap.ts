@@ -1,8 +1,8 @@
 import World from "~/world";
 
-export default class Default extends World{
-    static tag: string = 'default';
-    tag: string = Default.tag;
+export default class TestMap extends World{
+    static tag: string = 'testMap';
+    tag: string = TestMap.tag;
     maxWave: number = 2;
     width: number = 4;
     height: number = 4;
@@ -74,5 +74,5 @@ export default class Default extends World{
     constructor(){
         super();
     }
-    static {World.register(Default.tag, Default);}
+    static {World.register(TestMap.tag, TestMap);}
 }
