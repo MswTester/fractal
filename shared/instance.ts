@@ -3,6 +3,7 @@ import Entity from "./entity";
 import Structure from "./structure";
 import World from "./world";
 import Default from "./worlds/default";
+import Projectile from "./projectile";
 
 export default class Instance{
     // configures
@@ -10,7 +11,7 @@ export default class Instance{
 
     // properties
     private _app = new Application();
-    private _keymap: string[] = [];
+    keymap: string[] = [];
     private _camera: Container = new Container();
     private _id: string; // room's uuid
     private _players: IUser[]; // array of IUser
@@ -18,6 +19,7 @@ export default class Instance{
     private _map: string = '';
     private _entities: Entity[] = [];
     private _structures: Structure[] = [];
+    private _projectiles: Projectile[] = [];
     private _time: number = 0; // ms
     private _state: 'waiting'|'running' = 'waiting';
     private _wave: number = 0;
@@ -34,6 +36,7 @@ export default class Instance{
     get id():string{return this._id};
     get app():Application{return this._app};
     get maxWave():number{return this._world.waves.length};
+    get tileSize():number{return this._tileSize};
     async init(window: Window){
         await this._app.init({
             backgroundColor: 0x1099bb,
@@ -43,19 +46,23 @@ export default class Instance{
         this.resize();
     }
     isDown(key: string):boolean{
-        return this._keymap.includes(key);
+        return this.keymap.includes(key);
     }
     resize(){
         this._camera.position.set(this._app.screen.width / 2, this._app.screen.height / 2);
-        this._tileSize = Math.min(this._app.screen.width / this._world.width, this._app.screen.height / this._world.height);
+        this._tileSize = Math.max(this._app.screen.width * (9/16) / 10, this._app.screen.height / 10);
+        this._entities.forEach(entity => {
+            entity.sprite.width = this._tileSize * entity.scale.x;
+            entity.sprite.height = this._tileSize * entity.scale.y;
+        })
     };
     keydown(e: KeyboardEvent){
-        if (!this._keymap.includes(e.key)) {
-            this._keymap.push(e.key);
+        if (!this.keymap.includes(e.key)) {
+            this.keymap.push(e.key);
         }
     }
     keyup(e: KeyboardEvent){
-        this._keymap = this._keymap.filter(key => key !== e.key);
+        this.keymap = this.keymap.filter(key => key !== e.key);
     }
     destroy(){
         this._app.destroy();
@@ -77,10 +84,17 @@ export default class Instance{
         return this._app.ticker.add(fn, context, priority);
     }
 
-    addSprite(sprite: Sprite | Container){
-        this._camera.addChild(sprite);
+    addSprite(sprite: Sprite | Container){this._camera.addChild(sprite);}
+    removeSprite(sprite: Sprite | Container){this._camera.removeChild(sprite);}
+
+    addEntity(entity: Entity){
+        this._entities.push(entity);
+        if(!this._camera.children.find(sprite => sprite.uid === entity.sprite.uid)){
+            this.addSprite(entity.sprite);
+        }
     }
-    removeSprite(sprite: Sprite | Container){
-        this._camera.removeChild(sprite);
+    removeEntity(entity: Entity){
+        this._entities = this._entities.filter(e => e !== entity);
+        this.removeSprite(entity.sprite);
     }
 }

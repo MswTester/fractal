@@ -5,8 +5,9 @@ export default class Player extends Entity{
     static tag: string = 'player';
     tag: string = Player.tag;
     maxHealth: number = 100;
-    damage: number = 10;
-    speed: number = 5;
+    dDamage: number = 10;
+    dSpeed: number = 5;
+    dScale: Point = {x: 1, y: 3};
     attackable: boolean = true;
     team: string = '';
     headSlot: Item | null = null;

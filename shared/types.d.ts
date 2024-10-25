@@ -7,7 +7,10 @@ interface IEnvironment{
     amount: number;
 }
 
-interface 
+interface Point{
+    x: number;
+    y: number;
+}
 
 interface IWaveEnemy{
     tag: string; // Entity tag

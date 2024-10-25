@@ -30,9 +30,10 @@ export default function App(props:{
             texture: Assets.get(`/assets/entities/${myChar.tag}.svg`),
             anchor: {x:0.5, y:0.5},
             position: {x:0, y:0},
-            width: 100,
+            width: instance.tileSize,
             height: 100,
         })
+        instance.addEntity(myChar);
 
         const heart = new Sprite(Assets.get("/assets/test/heartsping.webp"))
         heart.anchor.set(0.5)

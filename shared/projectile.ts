@@ -1,17 +1,17 @@
 import { Container, Sprite } from "pixi.js";
 import { generateObjectUUID } from "./utils/auth";
 
-export default abstract class Entity{
-    private static registry: Map<string, new (...args:any[]) => Entity> = new Map();
-    static register(tag: string, entity: new (...args:any[]) => Entity){
-        Entity.registry.set(tag, entity);
+export default abstract class Projectile{
+    private static registry: Map<string, new (...args:any[]) => Projectile> = new Map();
+    static register(tag: string, projectile: new (...args:any[]) => Projectile){
+        Projectile.registry.set(tag, projectile);
     }
-    static create(tag: string):Entity {
-        const sub = Entity.registry.get(tag);
+    static create(tag: string):Projectile {
+        const sub = Projectile.registry.get(tag);
         if(sub){
             return new sub();
         } else {
-            throw new Error(`Entity with tag ${tag} not found`);
+            throw new Error(`Projectile with tag ${tag} not found`);
         }
     }
 
