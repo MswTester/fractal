@@ -1,3 +1,4 @@
+import { current } from "@reduxjs/toolkit";
 import { MetaFunction } from "@remix-run/node";
 import { useRef, useState } from "react";
 import { checkName, checkPassword, sha256 } from "~/utils/auth";
@@ -145,9 +146,16 @@ function Astar(props: { user: IUser }) {
                     if(!isCollision({start:target, end:destination})){
                         path.push(destination);
                     } else {
-
+                        let current = target;
+                        getFilteredNodes(current).forEach(node => {
+                            path.push(node);
+                        });
                     }
                 };
+
+                function getFilteredNodes(p:Point):Point[]{
+                    return nodes.filter(node => !isCollision({start:p, end:node}))
+                }
 
                 const createNodes = () => {
                     nodes = [];
