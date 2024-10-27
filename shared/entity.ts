@@ -1,5 +1,6 @@
 import { Container, Sprite } from "pixi.js";
 import { generateObjectUUID } from "./utils/auth";
+import { EventEmitter } from "./utils/features";
 
 export default abstract class Entity{
     private static registry: Map<string, new (...args:any[]) => Entity> = new Map();
@@ -14,11 +15,17 @@ export default abstract class Entity{
             throw new Error(`Entity with tag ${tag} not found`);
         }
     }
+    private _emitter:EventEmitter = new EventEmitter();
+    on(event: string, listener: (...args: any[]) => void){this._emitter.on(event, listener)};
+    emit(event: string, ...args: any[]){this._emitter.emit(event, ...args)};
+    off(event: string, listener: (...args: any[]) => void){this._emitter.off(event, listener)};
+    removeAllListeners(event: string){this._emitter.removeAllListeners(event)};
 
     abstract tag: string;
     abstract maxHealth: number;
     abstract dDamage: number;
     abstract dSpeed: number;
+    abstract dFriction: number;
     abstract dScale: Point;
     
     private readonly _id: string = generateObjectUUID();
@@ -65,20 +72,24 @@ export default abstract class Entity{
     };
 
     tick(delta: number){
-        const deltaSeconds = delta/1000;
-        if(this._velocity.x >= this.dSpeed){this._velocity.x = this.dSpeed;}
-        if(this._velocity.x <= -this.dSpeed){this._velocity.x = -this.dSpeed;}
-        if(this._velocity.y >= this.dSpeed){this._velocity.y = this.dSpeed;}
-        if(this._velocity.y <= -this.dSpeed){this._velocity.y = -this.dSpeed;}
-        this._position.x += this._velocity.x * deltaSeconds;
-        this._position.y += this._velocity.y * deltaSeconds;
-        this._velocity.x > 0 ? this._velocity.x -= this.dSpeed * deltaSeconds : this._velocity.x += this.dSpeed * deltaSeconds;
-        this._velocity.y > 0 ? this._velocity.y -= this.dSpeed * deltaSeconds : this._velocity.y += this.dSpeed * deltaSeconds;
+        const deceleration = 1 - this.dFriction;
+        if(this._velocity.x >= this.dSpeed / deceleration){this._velocity.x = this.dSpeed;}
+        if(this._velocity.x <= -this.dSpeed / deceleration){this._velocity.x = -this.dSpeed;}
+        if(this._velocity.y >= this.dSpeed / deceleration){this._velocity.y = this.dSpeed;}
+        if(this._velocity.y <= -this.dSpeed / deceleration){this._velocity.y = -this.dSpeed;}
+        this._position.x += this._velocity.x * delta/10;
+        this._position.y += this._velocity.y * delta/10;
+        this._velocity.x *= deceleration;
+        this._velocity.y *= deceleration;
     }
 
     move(angle: number){
-        this._velocity.x += this.dSpeed * Math.cos(angle) / 2;
-        this._velocity.y += this.dSpeed * Math.sin(angle) / 2;
+        this._velocity.x += this.dSpeed * Math.sin(angle) * this.dFriction;
+        this._velocity.y += this.dSpeed * Math.cos(angle) * this.dFriction;
+    }
+
+    destroy(){
+        this.emit('destroy');
     }
 }
 
@@ -89,6 +100,7 @@ export class Fox extends Entity{
     maxHealth: number = 100;
     dDamage: number = 10;
     dSpeed: number = 10;
+    dFriction: number = 0.5;
     dScale: Point = {x: 1, y: 1};
     constructor(){
         super();

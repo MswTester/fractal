@@ -14,8 +14,7 @@ export default function App(props:{
     const [assetsLoaded, setAssetsLoaded] = useState<boolean>(false)
     
     useOnce(async () => {
-        const instance = new Instance(generateUUID(), [props.user], props.user.id);
-        const controller = new Controller();
+        const controller = new Controller(new Instance(generateUUID(), [props.user], props.user.id), true);
 
         await controller.init(window)
         await Assets.load([
@@ -27,7 +26,7 @@ export default function App(props:{
         setAssetsLoaded(true)
         const myChar = new Player();
         myChar.equip(props.user.equipments);
-        instance.addEntity(myChar);
+        controller.addEntity(myChar);
 
         const heart = new Sprite(Assets.get("/assets/test/heartsping.webp"))
         heart.anchor.set(0.5)
@@ -39,23 +38,17 @@ export default function App(props:{
         gogo.setSize(100, 100)
         gogo.position.set(0, 0)
 
-        controller.addTicker((ticker) => {
-            if (controller.isDown("w")) {
-                myChar.move(0);
-                heart.y -= ticker.deltaTime
-            }
-            if (controller.isDown("s")) {
-                myChar.move(Math.PI/2);
-                heart.y += ticker.deltaTime
-            }
-            if (controller.isDown("a")) {
-                myChar.move(Math.PI/4*3);
-                heart.x -= ticker.deltaTime
-            }
-            if (controller.isDown("d")) {
-                myChar.move(Math.PI/4);
-                heart.x += ticker.deltaTime
-            }
+        controller.onKeypress("w", () => {
+            myChar.move(Math.PI);
+        })
+        controller.onKeypress("s", () => {
+            myChar.move(0);
+        })
+        controller.onKeypress("a", () => {
+            myChar.move(Math.PI*3/2);
+        })
+        controller.onKeypress("d", () => {
+            myChar.move(Math.PI/2);
         })
 
         controller.addResizeEvent(window)

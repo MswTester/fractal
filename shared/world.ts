@@ -30,8 +30,4 @@ export default abstract class World{
     private initialize() {
     }
     get id():string{return this._id};
-
-    tick(delta: number){
-        // do something
-    }
 }
