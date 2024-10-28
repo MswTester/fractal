@@ -22,8 +22,8 @@ export default class TestMap extends World{
     envAssets: string[] = [];
     environments: IEnvironment[] = [];
     entityAssets: string[] = [
-        '/assets/entities/fox.svg',
-        '/assets/entities/wolf.svg',
+        '/assets/test/heartsping.webp',
+        '/assets/test/gogoping.webp',
     ];
     playerSpawn: Bound = {
         x: 0,
