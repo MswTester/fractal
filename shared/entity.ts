@@ -27,6 +27,7 @@ export default abstract class Entity{
     abstract dSpeed: number;
     abstract dFriction: number;
     abstract dScale: Point;
+    abstract dAnchor: Point;
     
     private readonly _id: string = generateObjectUUID();
     private _health: number = 0;
@@ -77,8 +78,8 @@ export default abstract class Entity{
         if(this._velocity.x <= -this.dSpeed / deceleration){this._velocity.x = -this.dSpeed;}
         if(this._velocity.y >= this.dSpeed / deceleration){this._velocity.y = this.dSpeed;}
         if(this._velocity.y <= -this.dSpeed / deceleration){this._velocity.y = -this.dSpeed;}
-        this._position.x += this._velocity.x * delta/10;
-        this._position.y += this._velocity.y * delta/10;
+        this._position.x += this._velocity.x * delta/100;
+        this._position.y += this._velocity.y * delta/100;
         this._velocity.x *= deceleration;
         this._velocity.y *= deceleration;
     }
@@ -91,19 +92,4 @@ export default abstract class Entity{
     destroy(){
         this.emit('destroy');
     }
-}
-
-// Example of extending Entity
-export class Fox extends Entity{
-    static tag: string = 'fox';
-    tag: string = Fox.tag;
-    maxHealth: number = 100;
-    dDamage: number = 10;
-    dSpeed: number = 10;
-    dFriction: number = 0.5;
-    dScale: Point = {x: 1, y: 1};
-    constructor(){
-        super();
-    }
-    static {Entity.register(Fox.tag, Fox);}
 }

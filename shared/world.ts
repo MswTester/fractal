@@ -18,12 +18,15 @@ export default abstract class World{
     abstract maxWave: number;
     abstract width: number;
     abstract height: number;
-    abstract tiles: string[]; // tile assets url/path
+    abstract tileAssets: string[]; // tile assets url/path
     abstract tileMap: number[][]; // tileMap[y][x] = tileIndex of World.tiles
-    abstract playerSpawn: IZone;
-    abstract enemySpawn: IZone[];
+    abstract effects: IEffect[];
+    abstract envAssets: string[]; // environment assets url/path
+    abstract environments: IEnvironment[];
+    abstract entityAssets: string[]; // entity assets url/path
+    abstract playerSpawn: Bound;
+    abstract enemySpawn: Bound[];
     abstract waves: IWaveEnemy[][];
-    abstract environment: IEnvironment[];
     
     private readonly _id: string = generateObjectUUID();
     constructor(){this.initialize()}

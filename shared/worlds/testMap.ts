@@ -6,7 +6,7 @@ export default class TestMap extends World{
     maxWave: number = 2;
     width: number = 4;
     height: number = 4;
-    tiles: string[] = [
+    tileAssets: string[] = [
         '/assets/ttpack/Dirt/Dirt_17-512x512.png',
         '/assets/ttpack/Dirt/Dirt_18-512x512.png',
         '/assets/ttpack/Dirt/Dirt_19-512x512.png',
@@ -18,13 +18,20 @@ export default class TestMap extends World{
         [0, 1, 2, 3],
         [2, 2, 2, 2],
     ];
-    playerSpawn: IZone = {
+    effects: IEffect[] = [];
+    envAssets: string[] = [];
+    environments: IEnvironment[] = [];
+    entityAssets: string[] = [
+        '/assets/entities/fox.svg',
+        '/assets/entities/wolf.svg',
+    ];
+    playerSpawn: Bound = {
         x: 0,
         y: 0,
         width: 1,
         height: 1,
     };
-    enemySpawn: IZone[] = [
+    enemySpawn: Bound[] = [
         {
             x: 0,
             y: 0,
@@ -47,11 +54,13 @@ export default class TestMap extends World{
     waves: IWaveEnemy[][] = [
         [
             {
+                idx: 0,
                 tag: 'fox',
                 amount: 5,
                 spawn: 0,
             },
             {
+                idx: 1,
                 tag: 'wolf',
                 amount: 5,
                 spawn: 1,
@@ -59,18 +68,19 @@ export default class TestMap extends World{
         ],
         [
             {
+                idx: 0,
                 tag: 'fox',
                 amount: 10,
                 spawn: 0,
             },
             {
+                idx: 1,
                 tag: 'wolf',
                 amount: 10,
                 spawn: 1,
             },
         ],
     ];
-    environment: IEnvironment[] = [];
     constructor(){
         super();
     }

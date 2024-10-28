@@ -243,24 +243,24 @@ function Astar(props: { user: IUser }) {
                     });
 
                     // Draw path (green line)
-                    // ctx.lineWidth = 2;
-                    // if (path.length) {
-                    //     ctx.beginPath();
-                    //     ctx.strokeStyle = 'aqua';
-                    //     ctx.moveTo(target.x, target.y);
-                    //     path.forEach((p) => {
-                    //         ctx.lineTo(p.x, p.y);
-                    //     });
-                    //     ctx.stroke();
-                    // }
+                    ctx.lineWidth = 2;
+                    if (path.length) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = 'aqua';
+                        ctx.moveTo(target.x, target.y);
+                        path.forEach((p) => {
+                            ctx.lineTo(p.x, p.y);
+                        });
+                        ctx.stroke();
+                    }
 
                     // Draw nodes (yellow circles)
-                    // nodes.forEach((node) => {
-                    //     ctx.fillStyle = 'yellow';
-                    //     ctx.beginPath();
-                    //     ctx.arc(node.x, node.y, R, 0, Math.PI * 2);
-                    //     ctx.fill();
-                    // });
+                    nodes.forEach((node) => {
+                        ctx.fillStyle = 'yellow';
+                        ctx.beginPath();
+                        ctx.arc(node.x, node.y, R, 0, Math.PI * 2);
+                        ctx.fill();
+                    });
 
                     // Draw effects
                     effects = effects.filter(effect => {
@@ -299,10 +299,10 @@ function Astar(props: { user: IUser }) {
 
                 // Update the destination on canvas click
                 canvas.addEventListener('mousedown', (e) => {
-                    if(e.button === 1){
                     destination.x = e.offsetX;
                     destination.y = e.offsetY;
                     findPath();
+                    if(e.button === 1){
                     } else if(e.button === 2){
                         obstacles.push({x:e.offsetX, y:e.offsetY, width:1, height:1});
                     }

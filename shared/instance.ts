@@ -100,4 +100,5 @@ export default class Instance{
 
     addEntity(entity: Entity){this._entities.push(entity)}
     removeEntity(entity: Entity){this._entities = this._entities.filter(e => e !== entity)}
+    getEntity(id: string){return this._entities.find(e => e.id === id)}
 }
