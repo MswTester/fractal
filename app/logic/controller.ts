@@ -44,10 +44,19 @@ export default class Controller{
         this.addTicker((ticker) => this.tick(ticker.deltaMS));
         this.resize();
         this._app.stage.addChild(this._camera);
-        await Assets.load(this._instance.world.envAssets);
+        await Assets.load([
+            ...this._instance.world.tileAssets,
+            ...this._instance.world.envAssets,
+            ...this._instance.world.entityAssets
+        ]);
         this.applyWorld(this._instance.world);
     }
     applyWorld(world: World){
+        world.tileMap.forEach(row => {
+            row.forEach(num => {
+                
+            })
+        })
     }
     bindToCamera(entity: Entity){
         this._cameraBinder = entity.id;
