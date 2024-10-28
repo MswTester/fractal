@@ -1,5 +1,6 @@
 import { Assets, Sprite } from "pixi.js";
 import { useRef, useState } from "react";
+import Gogoping from "~/entities/gogoping";
 import Heartsping from "~/entities/heartsping";
 import Player from "~/entities/player";
 import Instance from "~/instance";
@@ -33,10 +34,9 @@ export default function App(props:{
         const heart = new Heartsping();
         controller.spawn(heart, 'test', 'webp');
 
-        const gogo = new Sprite(Assets.get("/assets/test/gogoping.webp"))
-        gogo.anchor.set(0.5)
-        gogo.setSize(100, 100)
-        gogo.position.set(0, 0)
+        const gogo = new Gogoping();
+        gogo.position = [1, 1];
+        controller.spawn(gogo, 'test', 'webp');
 
         controller.onKeypress("w", () => {
             myChar.move(Math.PI);
