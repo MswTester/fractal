@@ -29,6 +29,7 @@ export default class TestMap extends World{
     entityAssets: string[] = [
         '/assets/test/heartsping.webp',
         '/assets/test/gogoping.webp',
+        '/assets/test/romi.png',
     ];
     playerSpawn: Bound = {
         x: 0,

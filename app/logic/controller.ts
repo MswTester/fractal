@@ -1,5 +1,4 @@
-import { AdvancedBloomFilter, GodrayFilter, ShockwaveFilter, SimpleLightmapFilter } from "pixi-filters";
-import { Application, Assets, BlurFilter, Container, FilterEffect, Graphics, Sprite, Ticker, TickerCallback, TilingSprite } from "pixi.js";
+import { Application, Assets, Container, Graphics, Sprite, Ticker, TickerCallback, TilingSprite } from "pixi.js";
 import Entity from "~/entity";
 import Instance from "~/instance";
 import World from "~/world";
@@ -105,8 +104,8 @@ export default class Controller{
         if(this._keyupFn.has(e.key)) this._keyupFn.get(e.key)?.call(this, e);
     }
     updateCursorPos(e: MouseEvent){
-        this._cursorPosition.x = (e.clientX - innerWidth / 2 + this._cameraPosition.x * this._tileSize) / this._tileSize;
-        this._cursorPosition.y = (e.clientY - innerHeight / 2 + this._cameraPosition.y * this._tileSize) / this._tileSize;
+        this._cursorPosition.x = (e.offsetX - innerWidth / 2 + this._cameraPosition.x * this._tileSize) / this._tileSize;
+        this._cursorPosition.y = (e.offsetY - innerHeight / 2 + this._cameraPosition.y * this._tileSize) / this._tileSize;
     }
     buttondown(e: MouseEvent){
         this._buttonmap.add(e.button);
@@ -125,12 +124,12 @@ export default class Controller{
     removeKeydownEvent(element: Document){element.removeEventListener("keydown", this.keydown.bind(this))}
     addKeyupEvent(element: Document){element.addEventListener("keyup", this.keyup.bind(this))}
     removeKeyupEvent(element: Document){element.removeEventListener("keyup", this.keyup.bind(this))}
-    addButtondownEvent(element: Document){element.addEventListener("mousedown", this.buttondown.bind(this))}
-    removeButtondownEvent(element: Document){element.removeEventListener("mousedown", this.buttondown.bind(this))}
-    addButtonupEvent(element: Document){element.addEventListener("mouseup", this.buttonup.bind(this))}
-    removeButtonupEvent(element: Document){element.removeEventListener("mouseup", this.buttonup.bind(this))}
-    addMousemoveEvent(element: Document){element.addEventListener("mousemove", this.mousemove.bind(this))}
-    removeMousemoveEvent(element: Document){element.removeEventListener("mousemove", this.mousemove.bind(this))}
+    addButtondownEvent(canvas: HTMLCanvasElement = this._app.canvas){canvas.addEventListener("mousedown", this.buttondown.bind(this))}
+    removeButtondownEvent(canvas: HTMLCanvasElement = this._app.canvas){canvas.removeEventListener("mousedown", this.buttondown.bind(this))}
+    addButtonupEvent(canvas: HTMLCanvasElement = this._app.canvas){canvas.addEventListener("mouseup", this.buttonup.bind(this))}
+    removeButtonupEvent(canvas: HTMLCanvasElement = this._app.canvas){canvas.removeEventListener("mouseup", this.buttonup.bind(this))}
+    addMousemoveEvent(canvas: HTMLCanvasElement = this._app.canvas){canvas.addEventListener("mousemove", this.mousemove.bind(this))}
+    removeMousemoveEvent(canvas: HTMLCanvasElement = this._app.canvas){canvas.removeEventListener("mousemove", this.mousemove.bind(this))}
     addTicker(fn: TickerCallback<any>, context?: any, priority?: number):Ticker{return this._app.ticker.add(fn, context, priority)}
     destroy(){
         this._keymap.clear()

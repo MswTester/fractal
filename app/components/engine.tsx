@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 import "~/entities/gogoping";
 import "~/entities/heartsping";
 import Player from "~/entities/player";
+import Romi from "~/entities/romi";
 import Entity from "~/entity";
 import Instance from "~/instance";
 import Controller from "~/logic/controller";
@@ -22,8 +23,6 @@ export default function App(props:{
         await controller.init(window)
         await Assets.load([
             "/assets/entities/player.svg",
-            "/assets/test/heartsping.webp",
-            "/assets/test/gogoping.webp",
         ])
         appRef.current?.appendChild(controller.app.canvas)
         setAssetsLoaded(true)
@@ -57,9 +56,9 @@ export default function App(props:{
             controller.spawn(h, 'test', 'webp');
         })
         controller.onButtondown(2, p => {
-            const g = Entity.create('gogoping')
+            const g = new Romi();
             g.position = p;
-            controller.spawn(g, 'test', 'webp');
+            controller.spawn(g, 'test', 'png');
         })
 
         function preventDefault(e: Event){e.preventDefault()}
@@ -67,18 +66,18 @@ export default function App(props:{
         controller.addResizeEvent(window)
         controller.addKeydownEvent(document)
         controller.addKeyupEvent(document)
-        controller.addButtondownEvent(document)
-        controller.addButtonupEvent(document)
-        controller.addMousemoveEvent(document)
+        controller.addButtondownEvent()
+        controller.addButtonupEvent()
+        controller.addMousemoveEvent()
         return () => {
             controller.destroy();
             window.removeEventListener('contextmenu', preventDefault)
             controller.removeResizeEvent(window)
             controller.removeKeydownEvent(document)
             controller.removeKeyupEvent(document)
-            controller.removeButtondownEvent(document)
-            controller.removeButtonupEvent(document)
-            controller.removeMousemoveEvent(document)
+            controller.removeButtondownEvent()
+            controller.removeButtonupEvent()
+            controller.removeMousemoveEvent()
         }
     })
 
