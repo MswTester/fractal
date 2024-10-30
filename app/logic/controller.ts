@@ -1,9 +1,16 @@
-import { Application, Assets, Container, Graphics, Sprite, Ticker, TickerCallback, TilingSprite } from "pixi.js";
+import { Application, Assets, Container, Filter, Graphics, Sprite, Ticker, TickerCallback, TilingSprite } from "pixi.js";
 import Entity from "~/entity";
 import Instance from "~/instance";
+import { EventEmitter } from "~/utils/features";
 import World from "~/world";
 
 export default class Controller{
+    private _emitter:EventEmitter = new EventEmitter();
+    on(event: string, listener: (...args: any[]) => void){this._emitter.on(event, listener)};
+    emit(event: string, ...args: any[]){this._emitter.emit(event, ...args)};
+    off(event: string, listener: (...args: any[]) => void){this._emitter.off(event, listener)};
+    removeAllListeners(event: string){this._emitter.removeAllListeners(event)};
+
     private _tileScaleDivisor: number = 20;
     private _keymap: Set<string> = new Set();
     private _buttonmap: Set<number> = new Set();
@@ -77,9 +84,7 @@ export default class Controller{
         this._camera.addChild(worldContainer);
         this._app.stage.filters = []
     }
-    bindToCamera(entity: Entity){
-        this._cameraBinder = entity.id;
-    }
+    bindToCamera(entity: Entity){this._cameraBinder = entity.id;}
     isKeydown(key: string):boolean{return this._keymap.has(key)}
     isButtondown(button: number):boolean{return this._buttonmap.has(button)}
     resize(){
@@ -224,4 +229,8 @@ export default class Controller{
     offButtondown(button: number){this._buttondownFn.delete(button);}
     offButtonup(button: number){this._buttonupFn.delete(button);}
     offButtonpress(button: number){this._buttonpressedFn.delete(button);}
+
+    applyFilter(filter: Filter){
+        this._instance.emit('applyFilter', filter);
+    }
 }
