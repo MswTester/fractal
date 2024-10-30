@@ -1,18 +1,18 @@
-import { Application, Assets, Container, Graphics, Sprite, Ticker, TickerCallback } from "pixi.js";
+import { AdvancedBloomFilter, GodrayFilter, ShockwaveFilter, SimpleLightmapFilter } from "pixi-filters";
+import { Application, Assets, BlurFilter, Container, FilterEffect, Graphics, Sprite, Ticker, TickerCallback, TilingSprite } from "pixi.js";
 import Entity from "~/entity";
 import Instance from "~/instance";
 import World from "~/world";
 
-const tileScaleDivisor = 12;
-const cameraFriction = 10;
-
 export default class Controller{
+    private _tileScaleDivisor: number = 20;
     private _keymap: Set<string> = new Set();
     private _buttonmap: Set<number> = new Set();
     private _app: Application = new Application();
     private _camera: Container = new Container();
     private _cameraPosition: Point = {x: 0, y: 0};
     private _cameraBinder: string = ''; // entity id
+    private _cameraFriction: number = 5;
     private _debugger: Graphics = new Graphics();
     private _tileSize: number = 0;
     private _instance: Instance;
@@ -45,18 +45,38 @@ export default class Controller{
         this.resize();
         this._app.stage.addChild(this._camera);
         await Assets.load([
+            this._instance.world.background,
             ...this._instance.world.tileAssets,
             ...this._instance.world.envAssets,
-            ...this._instance.world.entityAssets
+            ...this._instance.world.entityAssets,
         ]);
         this.applyWorld(this._instance.world);
     }
     applyWorld(world: World){
-        world.tileMap.forEach(row => {
-            row.forEach(num => {
-                
+        const background = new TilingSprite(Assets.get(world.background));
+        background.label = "background";
+        background.zIndex = -1000; 
+        background.setSize(innerWidth, innerHeight);
+        this._app.stage.addChild(background);
+
+        const worldContainer = new Container();
+        worldContainer.label = "world";
+        worldContainer.zIndex = -999;
+        world.tileMap.forEach((row, i) => {
+            row.forEach((num, j) => {
+                const url = world.tileAssets[num]
+                if(url){
+                    const sprite = new TilingSprite(Assets.get(url));
+                    sprite.setSize(this._tileSize, this._tileSize);
+                    sprite.anchor.set(0.5, 0.5);
+                    sprite.position.set(j * this._tileSize, i * this._tileSize);
+                    sprite.label = `${i}-${j}`;
+                    worldContainer.addChild(sprite);
+                }
             })
         })
+        this._camera.addChild(worldContainer);
+        this._app.stage.filters = []
     }
     bindToCamera(entity: Entity){
         this._cameraBinder = entity.id;
@@ -66,7 +86,13 @@ export default class Controller{
     resize(){
         const screenWidth = innerWidth, screenHeight = innerHeight;
         this._camera.position.set(screenWidth / 2, screenHeight / 2);
-        this._tileSize = Math.max(screenWidth * (9/16) / tileScaleDivisor, screenHeight / tileScaleDivisor);
+        this._tileSize = Math.max(screenWidth * (9/16) / this._tileScaleDivisor, screenHeight / this._tileScaleDivisor);
+        this.getBackground()?.setSize(screenWidth, screenHeight);
+        this.getChild("world")?.children.forEach((sprite) => {
+            sprite.setSize(this._tileSize, this._tileSize);
+            const [x, y] = sprite.label.split("-").map(Number);
+            sprite.position.set(x * this._tileSize, y * this._tileSize);
+        });
     };
     addResizeEvent(element: Window){element.addEventListener("resize", this.resize.bind(this))}
     removeResizeEvent(element: Window){element.removeEventListener("resize", this.resize.bind(this))}
@@ -79,18 +105,18 @@ export default class Controller{
         if(this._keyupFn.has(e.key)) this._keyupFn.get(e.key)?.call(this, e);
     }
     updateCursorPos(e: MouseEvent){
-        this._cursorPosition.x = e.clientX;
-        this._cursorPosition.y = e.clientY;
+        this._cursorPosition.x = (e.clientX - innerWidth / 2 + this._cameraPosition.x * this._tileSize) / this._tileSize;
+        this._cursorPosition.y = (e.clientY - innerHeight / 2 + this._cameraPosition.y * this._tileSize) / this._tileSize;
     }
     buttondown(e: MouseEvent){
         this._buttonmap.add(e.button);
         this.updateCursorPos(e);
-        if(this._buttondownFn.has(e.button)) this._buttondownFn.get(e.button)?.call(this, this._cursorPosition);
+        if(this._buttondownFn.has(e.button)) this._buttondownFn.get(e.button)?.call(this, {...this._cursorPosition});
     }
     buttonup(e: MouseEvent){
         this._buttonmap.delete(e.button);
         this.updateCursorPos(e);
-        if(this._buttonupFn.has(e.button)) this._buttonupFn.get(e.button)?.call(this, this._cursorPosition);
+        if(this._buttonupFn.has(e.button)) this._buttonupFn.get(e.button)?.call(this, {...this._cursorPosition});
     }
     mousemove(e: MouseEvent){
         this.updateCursorPos(e);
@@ -114,6 +140,7 @@ export default class Controller{
     tick(delta: number){
         // sort children
         this._camera.children.forEach(sprite => {
+            if(sprite.label === "world") return;
             sprite.zIndex = sprite.y;
         });
         this._camera.sortChildren();
@@ -149,8 +176,8 @@ export default class Controller{
             if(entity){
                 const dx = entity.position.x - this._cameraPosition.x;
                 const dy = entity.position.y - this._cameraPosition.y;
-                this._cameraPosition.x += dx / (delta/cameraFriction);
-                this._cameraPosition.y += dy / (delta/cameraFriction);
+                this._cameraPosition.x += dx / (delta/this._cameraFriction);
+                this._cameraPosition.y += dy / (delta/this._cameraFriction);
             }
         }
         // camera
@@ -184,6 +211,7 @@ export default class Controller{
             sprite.destroy();
         }
     }
+    getBackground():TilingSprite|null{return this._app.stage.getChildByLabel("background") as TilingSprite}
     getChild(label: string):Container|Sprite|null{return this._camera.getChildByLabel(label);}
     onKeydown(key: string, callback: (...args: any[]) => void){this._keydownFn.set(key, callback);}
     onKeyup(key: string, callback: (...args: any[]) => void){this._keyupFn.set(key, callback);}
@@ -191,10 +219,10 @@ export default class Controller{
     offKeydown(key: string){this._keydownFn.delete(key);}
     offKeyup(key: string){this._keyupFn.delete(key);}
     offKeypress(key: string){this._keypressedFn.delete(key);}
-    onButtondown(button: number, callback: (pos:Point, ...args: any[]) => void){}
-    onButtonup(button: number, callback: (pos:Point, ...args: any[]) => void){}
-    onButtonpress(button: number, callback: (pos:Point, ...args: any[]) => void){}
-    offButtondown(button: number){}
-    offButtonup(button: number){}
-    offButtonpress(button: number){}
+    onButtondown(button: number, callback: (pos:Point, ...args: any[]) => void){this._buttondownFn.set(button, callback);}
+    onButtonup(button: number, callback: (pos:Point, ...args: any[]) => void){this._buttonupFn.set(button, callback);}
+    onButtonpress(button: number, callback: (pos:Point, ...args: any[]) => void){this._buttonpressedFn.set(button, callback);}
+    offButtondown(button: number){this._buttondownFn.delete(button);}
+    offButtonup(button: number){this._buttonupFn.delete(button);}
+    offButtonpress(button: number){this._buttonpressedFn.delete(button);}
 }

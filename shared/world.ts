@@ -18,13 +18,14 @@ export default abstract class World{
     abstract maxWave: number;
     abstract width: number;
     abstract height: number;
+    abstract background: string; // background asset url/path
     abstract tileAssets: string[]; // tile assets url/path
     abstract tileMap: number[][]; // tileMap[y][x] = tileIndex of World.tiles
     abstract effects: IEffect[];
     abstract envAssets: string[]; // environment assets url/path
     abstract environments: IEnvironment[];
-    abstract entityAssets: string[]; // entity assets url/path
     abstract playerSpawn: Bound;
+    abstract entityAssets: string[]; // entity assets url/path
     abstract enemySpawn: Bound[];
     abstract waves: IWaveEnemy[][];
     

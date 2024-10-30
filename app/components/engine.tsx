@@ -1,8 +1,9 @@
 import { Assets, Sprite } from "pixi.js";
 import { useRef, useState } from "react";
-import Gogoping from "~/entities/gogoping";
-import Heartsping from "~/entities/heartsping";
+import "~/entities/gogoping";
+import "~/entities/heartsping";
 import Player from "~/entities/player";
+import Entity from "~/entity";
 import Instance from "~/instance";
 import Controller from "~/logic/controller";
 import { generateUUID } from "~/utils/auth";
@@ -31,13 +32,6 @@ export default function App(props:{
         controller.spawn(myChar);
         controller.bindToCamera(myChar);
 
-        const heart = new Heartsping();
-        controller.spawn(heart, 'test', 'webp');
-
-        const gogo = new Gogoping();
-        gogo.position = [1, 1];
-        controller.spawn(gogo, 'test', 'webp');
-
         controller.onKeypress("w", () => {
             myChar.move(Math.PI);
         })
@@ -57,6 +51,19 @@ export default function App(props:{
             controller.camera.rotation += 0.1;
         })
 
+        controller.onButtondown(0, p => {
+            const h = Entity.create('heartsping')
+            h.position = p;
+            controller.spawn(h, 'test', 'webp');
+        })
+        controller.onButtondown(2, p => {
+            const g = Entity.create('gogoping')
+            g.position = p;
+            controller.spawn(g, 'test', 'webp');
+        })
+
+        function preventDefault(e: Event){e.preventDefault()}
+        window.addEventListener('contextmenu', preventDefault)
         controller.addResizeEvent(window)
         controller.addKeydownEvent(document)
         controller.addKeyupEvent(document)
@@ -65,6 +72,7 @@ export default function App(props:{
         controller.addMousemoveEvent(document)
         return () => {
             controller.destroy();
+            window.removeEventListener('contextmenu', preventDefault)
             controller.removeResizeEvent(window)
             controller.removeKeydownEvent(document)
             controller.removeKeyupEvent(document)

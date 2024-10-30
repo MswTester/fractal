@@ -1,4 +1,3 @@
-import { Container, Sprite } from "pixi.js";
 import { generateObjectUUID } from "./utils/auth";
 import { EventEmitter } from "./utils/features";
 
@@ -74,12 +73,12 @@ export default abstract class Entity{
 
     tick(delta: number){
         const deceleration = 1 - this.dFriction;
-        if(this._velocity.x >= this.dSpeed / deceleration){this._velocity.x = this.dSpeed;}
-        if(this._velocity.x <= -this.dSpeed / deceleration){this._velocity.x = -this.dSpeed;}
-        if(this._velocity.y >= this.dSpeed / deceleration){this._velocity.y = this.dSpeed;}
-        if(this._velocity.y <= -this.dSpeed / deceleration){this._velocity.y = -this.dSpeed;}
-        this._position.x += this._velocity.x * delta/100;
-        this._position.y += this._velocity.y * delta/100;
+        if(this._velocity.x >= this.dSpeed){this._velocity.x = this.dSpeed * this.dFriction;}
+        if(this._velocity.x <= -this.dSpeed){this._velocity.x = -this.dSpeed * this.dFriction;}
+        if(this._velocity.y >= this.dSpeed){this._velocity.y = this.dSpeed * this.dFriction;}
+        if(this._velocity.y <= -this.dSpeed){this._velocity.y = -this.dSpeed * this.dFriction;}
+        this._position.x += this._velocity.x * delta/1000;
+        this._position.y += this._velocity.y * delta/1000;
         this._velocity.x *= deceleration;
         this._velocity.y *= deceleration;
     }

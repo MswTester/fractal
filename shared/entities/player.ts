@@ -6,7 +6,7 @@ export default class Player extends Entity{
     tag: string = Player.tag;
     maxHealth: number = 100;
     dDamage: number = 10;
-    dSpeed: number = 1;
+    dSpeed: number = 5;
     dFriction: number = 0.3;
     dScale: Point = {x: 1, y: 2};
     dAnchor: Point = {x: 0.5, y: 0.75};
