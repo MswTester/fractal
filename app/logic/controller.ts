@@ -1,4 +1,5 @@
-import { Application, Assets, Container, Filter, Graphics, Sprite, Ticker, TickerCallback, TilingSprite } from "pixi.js";
+import { ColorMapFilter, DropShadowFilter, GodrayFilter, OutlineFilter, PixelateFilter, ShockwaveFilter, TwistFilter } from "pixi-filters";
+import { Application, Assets, BlurFilter, Container, DisplacementFilter, Filter, Graphics, Sprite, Ticker, TickerCallback, TilingSprite } from "pixi.js";
 import Entity from "~/entity";
 import Instance from "~/instance";
 import { EventEmitter } from "~/utils/features";
@@ -82,7 +83,7 @@ export default class Controller{
             })
         })
         this._camera.addChild(worldContainer);
-        this._app.stage.filters = []
+        this._app.stage.filters = [...world.effects.map(effect => this.makeFilter(effect.type, effect.options))];
     }
     bindToCamera(entity: Entity){this._cameraBinder = entity.id;}
     isKeydown(key: string):boolean{return this._keymap.has(key)}
@@ -189,6 +190,17 @@ export default class Controller{
             this._cameraPosition.x * this._tileSize,
             this._cameraPosition.y * this._tileSize
         );
+        // animate filters
+        if(Array.isArray(this._app.stage.filters)){
+            this._app.stage.filters.forEach(filter => {
+                if(
+                    filter instanceof ShockwaveFilter ||
+                    filter instanceof GodrayFilter
+                ){
+                    filter.time += delta/1000;
+                }
+            });
+        }
     }
     spawn(entity: Entity, _category:string = 'entities', _extender: string = 'svg'){
         this._instance.addEntity(entity);
@@ -231,6 +243,31 @@ export default class Controller{
     offButtonpress(button: number){this._buttonpressedFn.delete(button);}
 
     applyFilter(filter: Filter){
+        if(Array.isArray(this._app.stage.filters)){
+            this._app.stage.filters = [...this._app.stage.filters, filter]
+        }
         this._instance.emit('applyFilter', filter);
+    }
+    makeFilter(type: string, options: any):Filter{
+        switch(type){
+            case 'blur':
+                return new BlurFilter(options);
+            case 'colorMatrix':
+                return new ColorMapFilter(options);
+            case 'displacement':
+                return new DisplacementFilter(options);
+            case 'dropShadow':
+                return new DropShadowFilter(options);
+            case 'outline':
+                return new OutlineFilter(options);
+            case 'pixelate':
+                return new PixelateFilter(options);
+            case 'shockwave':
+                return new ShockwaveFilter(options);
+            case 'twist':
+                return new TwistFilter(options);
+            default:
+                return new Filter(options);
+        }
     }
 }

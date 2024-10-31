@@ -4,7 +4,7 @@ type vec4 = [number, number, number, number];
 
 interface IEffect{
     type: string;
-    amount: number;
+    options: any;
 }
 
 interface IEnvironment{
