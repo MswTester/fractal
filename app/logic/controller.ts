@@ -1,4 +1,4 @@
-import { ColorMapFilter, DropShadowFilter, GodrayFilter, OutlineFilter, PixelateFilter, ShockwaveFilter, TwistFilter } from "pixi-filters";
+import { AdjustmentFilter, AdvancedBloomFilter, BackdropBlurFilter, BloomFilter, BulgePinchFilter, ColorMapFilter, ConvolutionFilter, DropShadowFilter, GodrayFilter, GrayscaleFilter, MotionBlurFilter, OutlineFilter, PixelateFilter, RGBSplitFilter, ShockwaveFilter, SimpleLightmapFilter, TwistFilter, ZoomBlurFilter } from "pixi-filters";
 import { Application, Assets, BlurFilter, Container, DisplacementFilter, Filter, Graphics, Sprite, Ticker, TickerCallback, TilingSprite } from "pixi.js";
 import Entity from "~/entity";
 import Instance from "~/instance";
@@ -266,6 +266,30 @@ export default class Controller{
                 return new ShockwaveFilter(options);
             case 'twist':
                 return new TwistFilter(options);
+            case 'godray':
+                return new GodrayFilter(options);
+            case 'bloom':
+                return new BloomFilter(options);
+            case 'advancedBloom':
+                return new AdvancedBloomFilter(options);
+            case 'adjustment':
+                return new AdjustmentFilter(options);
+            case 'backdropBlur':
+                return new BackdropBlurFilter(options);
+            case 'bulgePinch':
+                return new BulgePinchFilter(options);
+            case 'convolution':
+                return new ConvolutionFilter(options);
+            case 'grayscale':
+                return new GrayscaleFilter();
+            case 'motionBlur':
+                return new MotionBlurFilter(options);
+            case 'rgbSplit':
+                return new RGBSplitFilter(options);
+            case 'simpleLightmap':
+                return new SimpleLightmapFilter(options);
+            case 'zoomBlur':
+                return new ZoomBlurFilter(options);
             default:
                 return new Filter(options);
         }
