@@ -35,3 +35,14 @@ interface Bound{
     width: number;
     height: number;
 }
+
+interface Line{
+    start: Point;
+    end: Point;
+}
+
+interface Circle{
+    x: number;
+    y: number;
+    radius: number;
+}

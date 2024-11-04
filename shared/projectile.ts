@@ -1,7 +1,7 @@
 import { Container, Sprite } from "pixi.js";
 import { generateObjectUUID } from "./utils/auth";
 import { EventEmitter } from "./utils/features";
-import { isPointInBound } from "./utils/vector";
+import { pointColBound } from "./utils/vector";
 
 export default abstract class Projectile{
     private static registry: Map<string, new (...args:any[]) => Projectile> = new Map();
@@ -52,7 +52,7 @@ export default abstract class Projectile{
     }
 
     isColliding(bound: Bound):boolean{
-        return isPointInBound(this._position, bound);
+        return pointColBound(this._position, bound);
     }
 
     destroy(){

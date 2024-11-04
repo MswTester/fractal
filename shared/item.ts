@@ -1,4 +1,5 @@
 import { generateObjectUUID } from "./utils/auth";
+import { EventEmitter } from "./utils/features";
 
 export default abstract class Item{
     private static registry: Map<string, new () => Item> = new Map();
@@ -13,14 +14,19 @@ export default abstract class Item{
             throw new Error(`Item with tag ${tag} not found`);
         }
     }
+    private _emitter:EventEmitter = new EventEmitter();
+    on(event: string, listener: (...args: any[]) => void){this._emitter.on(event, listener)};
+    emit(event: string, ...args: any[]){this._emitter.emit(event, ...args)};
+    off(event: string, listener: (...args: any[]) => void){this._emitter.off(event, listener)};
+    removeAllListeners(event: string){this._emitter.removeAllListeners(event)};
 
     abstract readonly tag: string;
     // 공격형 아이템 속성 (대개)
-    abstract damage: number; // amount
-    abstract criticalChance: number; // float
-    abstract criticalDamage: number; // float (multiplier)
-    abstract knockback: number; // amount
-    abstract cooldown: number; // ms
+    abstract dDamage: number; // amount
+    abstract dCriticalChance: number; // float
+    abstract dCriticalDamage: number; // float (multiplier)
+    abstract dKnockback: number; // amount
+    abstract dCooldown: number; // ms
     
     private readonly _id: string = generateObjectUUID();
     private _mainDown: boolean = false;

@@ -3,11 +3,11 @@ import Item from "~/item";
 export class WoodenSword extends Item{
     static tag: string = 'wooden_sword';
     tag: string = WoodenSword.tag;
-    damage: number = 10;
-    criticalChance: number = 0.1;
-    criticalDamage: number = 2;
-    knockback: number = 0.5;
-    cooldown: number = 500;
+    dDamage: number = 10;
+    dCriticalChance: number = 0.1;
+    dCriticalDamage: number = 2;
+    dKnockback: number = 0.5;
+    dCooldown: number = 500;
     constructor(){
         super();
     }
@@ -21,8 +21,10 @@ export class WoodenSword extends Item{
         // main interaction
         if(this.mainDown && this.restCooldown <= 0){
             this.mainInteraction();
-            this.restCooldown = this.cooldown;
+            this.restCooldown = this.dCooldown;
         }
     }
-    mainInteraction(): void {}
+    mainInteraction(): void {
+        this.emit('attack', this.dDamage);
+    }
 }
