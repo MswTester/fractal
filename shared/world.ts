@@ -28,6 +28,7 @@ export default abstract class World{
     abstract entityAssets: string[]; // entity assets url/path
     abstract enemySpawn: Bound[];
     abstract waves: IWaveEnemy[][];
+    abstract corePosition: Point;
     
     private readonly _id: string = generateObjectUUID();
     constructor(){this.initialize()}

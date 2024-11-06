@@ -29,7 +29,7 @@ export default function App(props:{
         setAssetsLoaded(true)
         const myChar = new Player();
         myChar.equip(props.user.equipments);
-        controller.spawn(myChar);
+        controller.spawn(myChar.id, myChar);
         controller.bindToCamera(myChar);
 
         controller.onKeypress("w", () => {
@@ -52,23 +52,23 @@ export default function App(props:{
         })
 
         controller.onButtondown(0, p => {
-            controller.applyFilter(new GodrayFilter({
-                gain: 0.5,
-                lacunarity: 2.5,
-                alpha: 0.8,
-                parallel: true,
-                angle: 30
-            }))
+            // controller.applyFilter(new GodrayFilter({
+            //     gain: 0.5,
+            //     lacunarity: 2.5,
+            //     alpha: 0.8,
+            //     parallel: true,
+            //     angle: 30
+            // }))
         })
         controller.onButtondown(2, p => {
-            controller.applyFilter(new ShockwaveFilter({
-                speed: 500,
-                amplitude: 50,
-                wavelength: 100,
-                brightness: 1,
-                radius: 2000,
-                center: p
-            }))
+            // controller.applyFilter(new ShockwaveFilter({
+            //     speed: 500,
+            //     amplitude: 50,
+            //     wavelength: 100,
+            //     brightness: 1,
+            //     radius: 2000,
+            //     center: p
+            // }))
         })
 
         function preventDefault(e: Event){e.preventDefault()}

@@ -9,6 +9,8 @@ export default class Heartsping extends Entity{
     dFriction: number = 0.3;
     dScale: Point = {x: 1, y: 1};
     dAnchor: Point = {x: 0.5, y: 0.5};
+    dHitbox: Point = {x: 1, y: 1};
+    dCates: string[] = ['attackable', 'enemy'];
 
     _state: string = 'idle';
     _target: Entity | null = null;

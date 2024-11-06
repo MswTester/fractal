@@ -87,6 +87,10 @@ export default class TestMap extends World{
             },
         ],
     ];
+    corePosition: Point = {
+        x: 4,
+        y: 4,
+    };
     constructor(){
         super();
     }

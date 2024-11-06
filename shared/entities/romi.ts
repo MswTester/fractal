@@ -9,6 +9,8 @@ export default class Romi extends Entity{
     dFriction: number = 0.3;
     dScale: Point = {x: 2, y: 2};
     dAnchor: Point = {x: 0.5, y: 0.5};
+    dHitbox: Point = {x: 2, y: 2};
+    dCates: string[] = ['attackable', 'enemy'];
     constructor(){
         super();
     }

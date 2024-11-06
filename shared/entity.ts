@@ -27,6 +27,8 @@ export default abstract class Entity{
     abstract dFriction: number;
     abstract dScale: Point;
     abstract dAnchor: Point;
+    abstract dHitbox: Point;
+    abstract dCates: string[];
     
     private readonly _id: string = generateObjectUUID();
     private _health: number = 0;
@@ -34,9 +36,12 @@ export default abstract class Entity{
     private _velocity: Point = {x: 0, y: 0};
     private _rotation: number = 0;
     private _scale: Point = {x: 1, y: 1};
+    private _cates: string[] = [];
+
     constructor(){this.initialize()}
     private initialize() {
         this._health = this.maxHealth;
+        this._cates = this.dCates;
     }
     get id():string{return this._id};
     get health():number{return this._health};
@@ -70,6 +75,14 @@ export default abstract class Entity{
             this._scale = value;
         }
     };
+    get boundbox():Bound{
+        return {
+            x: this._position.x - this.dHitbox.x/2,
+            y: this._position.y - this.dHitbox.y/2,
+            width: this.dHitbox.x,
+            height: this.dHitbox.y,
+        };
+    }
 
     tick(delta: number){
         const deceleration = 1 - this.dFriction;
@@ -90,5 +103,12 @@ export default abstract class Entity{
 
     destroy(){
         this.emit('destroy');
+    }
+
+    damage(damage: number){
+        this.health -= damage;
+        if(this.health <= 0){
+            this.destroy();
+        }
     }
 }

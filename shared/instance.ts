@@ -4,6 +4,7 @@ import World from "./world";
 import TestMap from "./worlds/testMap";
 import Projectile from "./projectile";
 import { EventEmitter } from "./utils/features";
+import { boundColBound, circleColBound, pointColBound } from "./utils/vector";
 
 interface DynamicState{
     time?: number;
@@ -27,8 +28,9 @@ export default class Instance{
 
     // properties
     private _id: string; // room's uuid
+    private _ownerId: string; // room's owner uuid
+    private _world: World = new TestMap();
     private _players: IUser[]; // array of IUser
-    private _ownerId: string;
     private _entities: Entity[] = [];
     private _structures: Structure[] = [];
     private _projectiles: Projectile[] = [];
@@ -36,7 +38,7 @@ export default class Instance{
     private _state: 'waiting'|'running' = 'waiting';
     private _wave: number = 0;
     private _leftWaitingTime: number = this._waitingTime; // ms
-    private _world: World = new TestMap();
+    private _coreHealth: number = 1000;
     private _lastState: DynamicState = {
         time: this._time,
         wave: this._wave,
@@ -51,6 +53,12 @@ export default class Instance{
         this._id = id;
         this._players = players;
         this._ownerId = ownerId;
+        this.on('spawn', (entity: Entity) => {
+            this.spawn(entity);
+        });
+        this.on('despawn', (entity: Entity) => {
+            this.despawn(entity);
+        });
     }
     get id():string{return this._id};
     get maxWave():number{return this._world.waves.length};
@@ -77,6 +85,30 @@ export default class Instance{
     update(state?:DynamicState){
     }
 
+    damagePoint(point: Point, damage: number, cates: string[]){
+        this._entities.forEach(entity => {
+            if(pointColBound(point, entity.boundbox)){
+                entity.damage(damage);
+            }
+        });
+    }
+
+    damageZone(bound:Bound, damage: number, cates: string[]){
+        this._entities.forEach(entity => {
+            if(boundColBound(bound, entity.boundbox)){
+                entity.damage(damage);
+            }
+        });
+    }
+
+    damageArc(circle:Circle, damage: number, cates: string[]){
+        this._entities.forEach(entity => {
+            if(circleColBound(circle, entity.boundbox)){
+                entity.damage(damage);
+            }
+        });
+    }
+
     // get dynamic state includes only changed properties
     getDynamicState(){
         const state: DynamicState = {
@@ -98,7 +130,9 @@ export default class Instance{
         return diff;
     }
 
-    addEntity(entity: Entity){this._entities.push(entity)}
-    removeEntity(entity: Entity){this._entities = this._entities.filter(e => e !== entity)}
+    spawn(entity: Entity){
+        this._entities.push(entity)
+    }
+    despawn(entity: Entity){this._entities = this._entities.filter(e => e !== entity)}
     getEntity(id: string){return this._entities.find(e => e.id === id)}
 }

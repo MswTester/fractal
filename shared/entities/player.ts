@@ -10,7 +10,9 @@ export default class Player extends Entity{
     dFriction: number = 0.3;
     dScale: Point = {x: 1, y: 2};
     dAnchor: Point = {x: 0.5, y: 0.75};
-    attackable: boolean = true;
+    dHitbox: Point = {x: 1, y: 1};
+    dCates: string[] = ['attackable', 'player'];
+
     team: string = '';
     headSlot: Item | null = null;
     bodySlot: Item | null = null;

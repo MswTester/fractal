@@ -1,5 +1,6 @@
 import { AdjustmentFilter, AdvancedBloomFilter, BackdropBlurFilter, BloomFilter, BulgePinchFilter, ColorMapFilter, ConvolutionFilter, DropShadowFilter, GodrayFilter, GrayscaleFilter, MotionBlurFilter, OutlineFilter, PixelateFilter, RGBSplitFilter, ShockwaveFilter, SimpleLightmapFilter, TwistFilter, ZoomBlurFilter } from "pixi-filters";
 import { Application, Assets, BlurFilter, Container, DisplacementFilter, Filter, Graphics, Sprite, Ticker, TickerCallback, TilingSprite } from "pixi.js";
+import { Socket } from "socket.io-client";
 import Entity from "~/entity";
 import Instance from "~/instance";
 import { EventEmitter } from "~/utils/features";
@@ -31,12 +32,24 @@ export default class Controller{
     private _buttonupFn: Map<number, (...args: any[]) => void> = new Map();
     private _buttonpressedFn: Map<number, (...args: any[]) => void> = new Map();
     private _cursorPosition: Point = {x: 0, y: 0};
+    private _socket: Socket|null = null;
 
     constructor(instance: Instance, client:boolean = false){
         this._instance = instance;
         this._isClient = client;
+        this.on('initialized', () => {
+            this.on('applyFilter', (type:string, opt:any) => {
+                this.applyFilter(type, opt);
+            })
+            this.on('spawn', (entityId:string, opt:any) => {
+                this.spawn(entityId, opt);
+            })
+            this.on('despawn', (entityId) => {
+                this.despawn(entityId);
+            })
+        })
     }
-    
+
     get app():Application{return this._app}
     get tileSize():number{return this._tileSize}
     get instance():Instance{return this._instance}
@@ -57,6 +70,7 @@ export default class Controller{
             ...this._instance.world.envAssets,
             ...this._instance.world.entityAssets,
         ]);
+        this.emit('initialized');
         this.applyWorld(this._instance.world);
     }
     applyWorld(world: World){
@@ -202,26 +216,20 @@ export default class Controller{
             });
         }
     }
-    spawn(entity: Entity, _category:string = 'entities', _extender: string = 'svg'){
-        this._instance.addEntity(entity);
-        const _sprite = new Sprite(Assets.get(`/assets/${_category}/${entity.tag}.${_extender}`));
-        _sprite.anchor.set(entity.dAnchor.x, entity.dAnchor.y);
-        _sprite.position.set(entity.position.x, entity.position.y);
-        _sprite.rotation = entity.rotation;
+    spawn(entityId: string, opt:any, _category:string = 'entities', _extender: string = 'svg'){
+        const _sprite = new Sprite(Assets.get(`/assets/${_category}/${opt.tag}.${_extender}`));
+        _sprite.anchor.set(opt.dAnchor.x, opt.dAnchor.y);
+        _sprite.position.set(opt.position.x, opt.position.y);
+        _sprite.rotation = opt.rotation;
         _sprite.setSize(
-            this._tileSize * entity.dScale.x * entity.scale.x,
-            this._tileSize * entity.dScale.y * entity.scale.y
+            this._tileSize * opt.dScale.x * opt.scale.x,
+            this._tileSize * opt.dScale.y * opt.scale.y
         );
-        _sprite.label = entity.id;
+        _sprite.label = entityId;
         this._camera.addChild(_sprite);
-        entity.on('destroy', () => {
-            entity.removeAllListeners("destroy");
-            this.despawn(entity);
-        });
     }
-    despawn(entity: Entity){
-        this._instance.removeEntity(entity);
-        const sprite = this.getChild(entity.id);
+    despawn(entityId: string){
+        const sprite = this.getChild(entityId);
         if(sprite){
             this._camera.removeChild(sprite);
             sprite.destroy();
@@ -242,11 +250,10 @@ export default class Controller{
     offButtonup(button: number){this._buttonupFn.delete(button);}
     offButtonpress(button: number){this._buttonpressedFn.delete(button);}
 
-    applyFilter(filter: Filter){
+    applyFilter(type:string, options:any){
         if(Array.isArray(this._app.stage.filters)){
-            this._app.stage.filters = [...this._app.stage.filters, filter]
+            this._app.stage.filters = [...this._app.stage.filters, this.makeFilter(type, options)];
         }
-        this._instance.emit('applyFilter', filter);
     }
     makeFilter(type: string, options: any):Filter{
         switch(type){
