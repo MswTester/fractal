@@ -24,7 +24,7 @@ export default function App(props:{
         await controller.init(window)
         appRef.current?.appendChild(controller.app.canvas)
         setAssetsLoaded(true)
-        const myChar = new Player();
+        const myChar = new Player(props.user.id);
         myChar.equip(props.user.equipments);
         controller.spawn(myChar.id, myChar);
         controller.bindToCamera(myChar);
