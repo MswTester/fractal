@@ -6,16 +6,6 @@ import Projectile from "./projectile";
 import { EventEmitter } from "./utils/features";
 import { boundColBound, circleColBound, pointColBound } from "./utils/vector";
 
-interface DynamicState{
-    time?: number;
-    wave?: number;
-    leftWaitingTime?: number;
-    state?: 'waiting'|'running';
-    entities?: Entity[];
-    structures?: Structure[];
-    projectiles?: Projectile[];
-}
-
 export default class Instance{
     private _emitter:EventEmitter = new EventEmitter();
     on(event: string, listener: (...args: any[]) => void){this._emitter.on(event, listener)};
@@ -34,31 +24,25 @@ export default class Instance{
     private _entities: Entity[] = [];
     private _structures: Structure[] = [];
     private _projectiles: Projectile[] = [];
-    private _time: number = 0; // ms
+    private _startedTime: number = Date.now(); // Date.now()
     private _state: 'waiting'|'running' = 'waiting';
     private _wave: number = 0;
-    private _leftWaitingTime: number = this._waitingTime; // ms
+    private _leftWaitingCooldown: number = Date.now(); // Date.now()
     private _coreHealth: number = 1000;
     private _lastState: DynamicState = {
-        time: this._time,
         wave: this._wave,
-        leftWaitingTime: this._waitingTime,
+        leftWaitingCooldown: this._leftWaitingCooldown,
         state: this._state,
-        entities: this._entities,
-        structures: this._structures,
-        projectiles: this._projectiles,
+        coreHealth: this._coreHealth,
     };
+    private _lastEntities: {}[] = [];
+    private _lastProjectiles: {}[] = [];
+    private _lastStructures: {}[] = [];
 
     constructor(id: string, players: IUser[], ownerId:string){
         this._id = id;
         this._players = players;
         this._ownerId = ownerId;
-        this.on('spawn', (entity: Entity) => {
-            this.spawn(entity);
-        });
-        this.on('despawn', (entity: Entity) => {
-            this.despawn(entity);
-        });
     }
     get id():string{return this._id};
     get maxWave():number{return this._world.waves.length};
@@ -66,10 +50,11 @@ export default class Instance{
     get structures():Structure[]{return this._structures};
     get projectiles():Projectile[]{return this._projectiles};
     get world():World{return this._world};
-    get time():number{return this._time};
+    get startedTime():number{return this._startedTime};
+    get time():number{return Date.now() - this._startedTime};
     get state():'waiting'|'running'{return this._state};
     get wave():number{return this._wave};
-    get leftWaitingTime():number{return this._leftWaitingTime};
+    get leftWaitingCooldown():number{return this._leftWaitingCooldown};
 
     tick(delta: number){
         // tick entities
@@ -79,30 +64,77 @@ export default class Instance{
         // tick projectiles
         this._projectiles.forEach(projectile => projectile.tick(delta));
 
-        this._time += delta;
+        if(this._state === 'waiting'){
+            const _leftTime:number = this._waitingTime + this._leftWaitingCooldown - Date.now()
+            if(_leftTime <= 0){
+                this._state = 'running'
+            }
+        } else {
+        }
     }
 
-    update(state?:DynamicState){
+    update(_updater:Updater){
+        const _set = _updater.$set;
+        if(_set) Object.keys(_set).forEach(key => {
+            this.setState(key, _set[key])
+        })
+        const _setObj = _updater.$setObj;
+        if(_setObj) {
+            Object.keys(_setObj).forEach(uid => {
+                this.getEntity(uid)?.setState(_setObj[uid])
+                this.getProjectile(uid)?.setState(_setObj[uid])
+                this.getStructure(uid)?.setState(_setObj[uid])
+            })
+        }
+        const _addObj = _updater.$addObj;
+        const _delObj = _updater.$delObj;
+        if(_delObj) {
+            Object.keys(_delObj).forEach(uid => {
+                this.despawnEntityById(uid)
+                this.despawnProjectileById(uid)
+                this.despawnStructureById(uid)
+            })
+        }
+    }
+    setState(key:string, value:any){
+        switch(key){
+            case 'wave':{
+                this._wave = value;
+                break;
+            };
+            case 'leftWaitingCooldown':{
+                this._leftWaitingCooldown = value;
+                break;
+            };
+            case 'state':{
+                this._state = value;
+                break;
+            }
+            case 'coreHealth':{
+                this._coreHealth = value;
+                break;
+            }
+        }
     }
 
-    damagePoint(point: Point, damage: number, cates: string[]){
-        this._entities.forEach(entity => {
+    damagePoint(point: Point, damage: number, cates: string[] = []){
+        this._entities.filter(e => cates.some(category => e.dCates.includes(category))).forEach(entity => {
             if(pointColBound(point, entity.boundbox)){
                 entity.damage(damage);
             }
         });
     }
 
-    damageZone(bound:Bound, damage: number, cates: string[]){
-        this._entities.forEach(entity => {
+    damageZone(bound:Bound, damage: number, cates: string[] = []){
+        this._entities.filter(e => cates.some(category => e.dCates.includes(category))).forEach(entity => {
             if(boundColBound(bound, entity.boundbox)){
                 entity.damage(damage);
             }
         });
     }
 
-    damageArc(circle:Circle, damage: number, cates: string[]){
-        this._entities.forEach(entity => {
+    damageArc(circle:Circle, damage: number, cates: string[] = []){
+        this._entities.filter(e => cates.some(category => e.dCates.includes(category))).forEach(entity => {
             if(circleColBound(circle, entity.boundbox)){
                 entity.damage(damage);
             }
@@ -110,15 +142,12 @@ export default class Instance{
     }
 
     // get dynamic state includes only changed properties
-    getDynamicState(){
+    getDynamicState():DynamicState{
         const state: DynamicState = {
-            time: this._time,
             wave: this._wave,
-            leftWaitingTime: this._leftWaitingTime,
+            leftWaitingCooldown: this._leftWaitingCooldown,
             state: this._state,
-            entities: this._entities,
-            structures: this._structures,
-            projectiles: this._projectiles,
+            coreHealth: this._coreHealth,
         }
         const diff = Object.keys(state).reduce((acc:any, key) => {
             if(this._lastState[key as keyof DynamicState] !== state[key as keyof DynamicState]){
@@ -130,9 +159,26 @@ export default class Instance{
         return diff;
     }
 
-    spawn(entity: Entity){
-        this._entities.push(entity)
+    getUpdater():Updater{
+        return {
+            $set: this.getDynamicState(),
+        }
     }
-    despawn(entity: Entity){this._entities = this._entities.filter(e => e !== entity)}
+
+    spawnEntity(entity: Entity){this._entities.push(entity)}
+    despawnEntity(entity: Entity){this._entities = this._entities.filter(e => e !== entity)}
+    despawnEntityById(entityId: string){this._entities = this._entities.filter(e => e.id !== entityId)}
     getEntity(id: string){return this._entities.find(e => e.id === id)}
+    spawnProjectile(projectile: Projectile){this._projectiles.push(projectile)}
+    despawnProjectile(projectile: Projectile){this._projectiles = this._projectiles.filter(p => p !== projectile)}
+    despawnProjectileById(projectileId: string){this._projectiles = this._projectiles.filter(p => p.id !== projectileId)}
+    getProjectile(id: string){return this._projectiles.find(p => p.id === id)}
+    spawnStructure(structure: Structure){this._structures.push(structure)}
+    despawnStructure(structure: Structure){this._structures = this._structures.filter(s => s !== structure)}
+    despawnStructureById(structureId: string){this._structures = this._structures.filter(s => s.id !== structureId)}
+    getStructure(id: string){return this._structures.find(s => s.id === id)}
+
+    command(_command:string){
+        const prefix = _command.split(' ')[0]
+    }
 }

@@ -5,14 +5,13 @@ type vec4 = [number, number, number, number];
 interface IEffect{
     type: string;
     options: any;
+    duration: number;
 }
 
 interface IEnvironment{
     idx: number;
-    x: number;
-    y: number;
-    width: number;
-    height: number;
+    position: Point;
+    scale: Point;
     hitboxScale: Point;
     isCollidable: boolean;
 }
@@ -23,10 +22,15 @@ interface Point{
 }
 
 interface IWaveEnemy{
-    idx: number; // entity asset idx
     tag: string; // Entity tag
     amount: number;
     spawn: number; // spawnZone index
+    interval: number; // ms
+}
+
+interface IWave{
+    enemies:IWaveEnemy[];
+    interval: number; // ms
 }
 
 interface Bound{
@@ -45,4 +49,18 @@ interface Circle{
     x: number;
     y: number;
     radius: number;
+}
+
+interface DynamicState{
+    wave?: number;
+    leftWaitingCooldown?: number;
+    state?: 'waiting'|'running';
+    coreHealth?: number;
+}
+
+interface Updater{
+    $set?:{[key:string]:any};
+    $setObj?:{[key:string]:{}}; // state modifer
+    $addObj?:{[key:string]:{}};
+    $delObj?:string[]; // object's uuid
 }

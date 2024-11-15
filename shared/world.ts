@@ -25,9 +25,8 @@ export default abstract class World{
     abstract envAssets: string[]; // environment assets url/path
     abstract environments: IEnvironment[];
     abstract playerSpawn: Bound;
-    abstract entityAssets: string[]; // entity assets url/path
     abstract enemySpawn: Bound[];
-    abstract waves: IWaveEnemy[][];
+    abstract waves: IWave[];
     abstract corePosition: Point;
     
     private readonly _id: string = generateObjectUUID();

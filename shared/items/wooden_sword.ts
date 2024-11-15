@@ -8,6 +8,7 @@ export class WoodenSword extends Item{
     dCriticalDamage: number = 2;
     dKnockback: number = 0.5;
     dCooldown: number = 500;
+    dCates: string[] = [];
     constructor(){
         super();
     }

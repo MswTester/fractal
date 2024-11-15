@@ -57,35 +57,41 @@ export default class TestMap extends World{
             height: 1,
         },
     ];
-    waves: IWaveEnemy[][] = [
-        [
-            {
-                idx: 0,
-                tag: 'fox',
-                amount: 5,
-                spawn: 0,
-            },
-            {
-                idx: 1,
-                tag: 'wolf',
-                amount: 5,
-                spawn: 1,
-            },
-        ],
-        [
-            {
-                idx: 0,
-                tag: 'fox',
-                amount: 10,
-                spawn: 0,
-            },
-            {
-                idx: 1,
-                tag: 'wolf',
-                amount: 10,
-                spawn: 1,
-            },
-        ],
+    waves: IWave[] = [
+        {
+            enemies: [
+                {
+                    tag: 'fox',
+                    amount: 5,
+                    spawn: 0,
+                    interval: 100,
+                },
+                {
+                    tag: 'wolf',
+                    amount: 5,
+                    spawn: 1,
+                    interval: 100,
+                },
+            ],
+            interval: 100,
+        },
+        {
+            enemies: [
+                {
+                    tag: 'fox',
+                    amount: 10,
+                    spawn: 0,
+                    interval: 100,
+                },
+                {
+                    tag: 'wolf',
+                    amount: 10,
+                    spawn: 1,
+                    interval: 100,
+                },
+            ],
+            interval: 100,
+        }
     ];
     corePosition: Point = {
         x: 4,

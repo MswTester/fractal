@@ -68,18 +68,18 @@ export default class Controller{
             this._instance.world.background,
             ...this._instance.world.tileAssets,
             ...this._instance.world.envAssets,
-            ...this._instance.world.entityAssets,
         ]);
         this.emit('initialized');
         this.applyWorld(this._instance.world);
     }
     applyWorld(world: World){
+        // background
         const background = new TilingSprite(Assets.get(world.background));
         background.label = "background";
         background.zIndex = -1000; 
         background.setSize(innerWidth, innerHeight);
         this._app.stage.addChild(background);
-
+        // tile
         const worldContainer = new Container();
         worldContainer.label = "world";
         worldContainer.zIndex = -999;
@@ -96,6 +96,9 @@ export default class Controller{
                 }
             })
         })
+        // environment
+        
+        // apply
         this._camera.addChild(worldContainer);
         this._app.stage.filters = [...world.effects.map(effect => this.makeFilter(effect.type, effect.options))];
     }
@@ -167,7 +170,7 @@ export default class Controller{
         if(this._isClient){
             this._instance.tick(delta);
         } else {
-            this._instance.update();
+            this._instance.update({});
         }
         // update entities
         this._instance.entities.forEach(entity => {

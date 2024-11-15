@@ -29,7 +29,7 @@ export default abstract class Entity{
     abstract dAnchor: Point;
     abstract dHitbox: Point;
     abstract dCates: string[];
-    
+
     private readonly _id: string = generateObjectUUID();
     private _health: number = 0;
     private _position: Point = {x: 0, y: 0};
@@ -37,6 +37,7 @@ export default abstract class Entity{
     private _rotation: number = 0;
     private _scale: Point = {x: 1, y: 1};
     private _cates: string[] = [];
+    private _state: string = '';
 
     constructor(){this.initialize()}
     private initialize() {
@@ -94,6 +95,16 @@ export default abstract class Entity{
         this._position.y += this._velocity.y * delta/1000;
         this._velocity.x *= deceleration;
         this._velocity.y *= deceleration;
+    }
+
+    getState(){
+        return {
+
+        }
+    }
+
+    setState(_state:{}):void{
+
     }
 
     move(angle: number){

@@ -27,11 +27,13 @@ export default abstract class Item{
     abstract dCriticalDamage: number; // float (multiplier)
     abstract dKnockback: number; // amount
     abstract dCooldown: number; // ms
+    abstract dCates: string[];
     
     private readonly _id: string = generateObjectUUID();
     private _mainDown: boolean = false;
     private _subDown: boolean = false;
-    private _restCooldown: number = 0;
+    private _restCooldown: number = Date.now();
+    private _cates: string[] = [];
     constructor(){this.initialize()}
     private initialize() {
     }
@@ -40,8 +42,8 @@ export default abstract class Item{
     set mainDown(value: boolean){this._mainDown = value};
     get subDown():boolean{return this._subDown};
     set subDown(value: boolean){this._subDown = value};
-    get restCooldown():number{return this._restCooldown};
-    set restCooldown(value: number){this._restCooldown = value};
+    get restCooldown():number{return Date.now() - this._restCooldown};
+    set restCooldown(value: number){this._restCooldown = Date.now() - this.dCooldown + value};
 
     tick(delta: number){}
     mainInteraction(){}

@@ -26,6 +26,7 @@ export default abstract class Projectile{
     abstract maxHealth: number;
     abstract dDamage: number;
     abstract dSpeed: number;
+    abstract dCates: string[];
 
     private readonly _id: string = generateObjectUUID();
     private _health: number = 0;
@@ -34,6 +35,8 @@ export default abstract class Projectile{
     private _velocity: Point = {x: 0, y: 0};
     private _rotation: number = 0;
     private _scale: Point = {x: 1, y: 1};
+    private _cates: string[] = [];
+    private _state: string = '';
     constructor(){this.initialize()}
     private initialize() {
         this._health = this.maxHealth;
@@ -44,11 +47,20 @@ export default abstract class Projectile{
     set health(value:number){this._health = value};
 
     tick(delta: number){
-        this.health -= delta;
         if(this.health <= 0) {
             this.health = 0;
             this.destroy();
         }
+    }
+
+    getState(){
+        return {
+            
+        }
+    }
+
+    setState(_state:{}):void{
+
     }
 
     isColliding(bound: Bound):boolean{
