@@ -19,7 +19,7 @@ export default class Player extends Entity{
     legsSlot: Item | null = null;
     mainWeapon: Item | null = null;
     subWeapon: Item | null = null;
-    constructor(){super();}
+    constructor(uid:string){super(uid)}
     static {Entity.register(Player.tag, Player);}
 
     equip(equipments: IEquipment[]){

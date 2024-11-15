@@ -22,9 +22,6 @@ export default function App(props:{
         const controller = new Controller(new Instance(generateUUID(), [props.user], props.user.id), true);
 
         await controller.init(window)
-        await Assets.load([
-            "/assets/entities/player.svg",
-        ])
         appRef.current?.appendChild(controller.app.canvas)
         setAssetsLoaded(true)
         const myChar = new Player();

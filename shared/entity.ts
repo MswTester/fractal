@@ -39,7 +39,10 @@ export default abstract class Entity{
     private _cates: string[] = [];
     private _state: string = '';
 
-    constructor(){this.initialize()}
+    constructor(id?:string){
+        this._id = id || generateObjectUUID();
+        this.initialize()
+    }
     private initialize() {
         this._health = this.maxHealth;
         this._cates = this.dCates;

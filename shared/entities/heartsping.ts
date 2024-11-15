@@ -12,7 +12,6 @@ export default class Heartsping extends Entity{
     dHitbox: Point = {x: 1, y: 1};
     dCates: string[] = ['attackable', 'enemy'];
 
-    _state: string = 'idle';
     _target: Entity | null = null;
     _path: Point[] = [];
     _attackRange: number = 0.3;
@@ -36,8 +35,7 @@ export default class Heartsping extends Entity{
             const dx = this._target.position.x - this.position.x;
             const dy = this._target.position.y - this.position.y;
             const angle = Math.atan2(dy, dx);
-            this.velocity.x = Math.cos(angle) * this.dSpeed;
-            this.velocity.y = Math.sin(angle) * this.dSpeed;
+            this.move(angle)
             const distance = Math.sqrt(Math.pow(this.position.x - this._target.position.x, 2) + Math.pow(this.position.y - this._target.position.y, 2));
             if(distance < this._attackRange){
                 this.attack(this._target);

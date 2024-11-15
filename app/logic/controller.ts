@@ -65,6 +65,7 @@ export default class Controller{
         this.resize();
         this._app.stage.addChild(this._camera);
         await Assets.load([
+            "/assets/entities/player.svg",
             this._instance.world.background,
             ...this._instance.world.tileAssets,
             ...this._instance.world.envAssets,
@@ -97,12 +98,13 @@ export default class Controller{
             })
         })
         // environment
-        
+
         // apply
         this._camera.addChild(worldContainer);
         this._app.stage.filters = [...world.effects.map(effect => this.makeFilter(effect.type, effect.options))];
     }
     bindToCamera(entity: Entity){this._cameraBinder = entity.id;}
+    bindToCameraById(entityId: string){this._cameraBinder = entityId;}
     isKeydown(key: string):boolean{return this._keymap.has(key)}
     isButtondown(button: number):boolean{return this._buttonmap.has(button)}
     resize(){
