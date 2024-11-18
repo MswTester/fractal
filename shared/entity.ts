@@ -102,7 +102,15 @@ export default abstract class Entity{
 
     getState(){
         return {
-
+            id: this._id,
+            tag: this.tag,
+            health: this._health,
+            position: [this.position.x, this.position.y],
+            velocity: [this.velocity.x, this.velocity.y],
+            rotation: this.rotation,
+            scale: [this.scale.x, this.scale.y],
+            cates: this._cates,
+            state: this._state,
         }
     }
 

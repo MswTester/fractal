@@ -16,10 +16,12 @@ export default class Instance{
     // configures
     private readonly _waitingTime = 10000;
 
-    // properties
+    // static properties
     private _id: string; // room's uuid
     private _ownerId: string; // room's owner uuid
     private _world: World = new TestMap();
+
+    // dynamic properties
     private _players: IUser[]; // array of IUser
     private _entities: Entity[] = [];
     private _structures: Structure[] = [];
@@ -35,9 +37,9 @@ export default class Instance{
         state: this._state,
         coreHealth: this._coreHealth,
     };
-    private _lastEntities: {}[] = [];
-    private _lastProjectiles: {}[] = [];
-    private _lastStructures: {}[] = [];
+    private _lastEntities: KeystringAny[] = [];
+    private _lastProjectiles: KeystringAny[] = [];
+    private _lastStructures: KeystringAny[] = [];
 
     constructor(id: string, players: IUser[], ownerId:string){
         this._id = id;

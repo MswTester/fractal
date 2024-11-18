@@ -64,3 +64,8 @@ interface Updater{
     $addObj?:{[key:string]:{}};
     $delObj?:string[]; // object's uuid
 }
+
+type KeystringAny = {[key:string]:any};
+type KeystringString = {[key:string]:string};
+type KeystringNumber = {[key:string]:number};
+type KeystringBoolean = {[key:string]:boolean};
